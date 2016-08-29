@@ -6,10 +6,10 @@ use Outhentix::Context;
 class Outhentix {
 
   has Array @.results;
-  has Array @.original_context;
-  has Array @.current_context;
-  has Outhentix::Context $.context_modificator;
-
+  has Array @.original-context;
+  has Array @.current-context;
+  has Outhentix::Context $.context-modificator;
+  has Bool $.has-context = False;
 }
 
 
