@@ -5,9 +5,9 @@ scratch using Perl6. Meanwhile follow [Outthentic::DSL](https://github.com/melez
 to understand what Outhentix is.
 
 # INSTALL
-
-   $ panda install Outhentix
-
+    
+    $ panda install Outhentix
+    
 # Author
 
 [Alexey Melezhik](mailto:melezhik@gmail.com)
