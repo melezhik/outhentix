@@ -1,0 +1,17 @@
+{
+  "name"        : "Outhentix",
+  "version"     : "*",
+  "description" : "Text validator DSL",
+  "authors" : [ "Alexey Melezhik"],
+  "depends"     : [
+                  ],
+  "source-type" : "git",
+  "support" : {
+        "bugtracker" : "https://github.com/melezhik/outhentix/issues",
+        "source" : "https://github.com/melezhik/outhetix.git"
+    },
+   "provides" : {
+        "Outhentix" : "lib/Outhentix.pm6"
+  },
+  "source-url"  : "https://github.com/melezhik/outhetix.git"
+}
