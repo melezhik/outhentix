@@ -4,6 +4,9 @@ Outhentix is a future replacement of Outthentic::DSL. I am going to rewrite all 
 scratch using Perl6. Meanwhile follow [Outthentic::DSL](https://github.com/melezhik/outthentic-dsl)
 to understand what Outhentix is.
 
+# INSTALL
+
+   $ panda install Outhentix
 
 # Author
 

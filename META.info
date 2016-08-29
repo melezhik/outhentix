@@ -8,10 +8,10 @@
   "source-type" : "git",
   "support" : {
         "bugtracker" : "https://github.com/melezhik/outhentix/issues",
-        "source" : "https://github.com/melezhik/outhetix.git"
+        "source" : "https://github.com/melezhik/outhentix.git"
     },
    "provides" : {
         "Outhentix" : "lib/Outhentix.pm6"
   },
-  "source-url"  : "https://github.com/melezhik/outhetix.git"
+  "source-url"  : "https://github.com/melezhik/outhentix.git"
 }
