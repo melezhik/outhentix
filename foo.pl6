@@ -1,19 +1,5 @@
-my $s1 = '
-REGEXP
-CODE: FOO 
-
-  OK 
-
-  OK 
-
-FOO
-';
-
 my $s = '
-REGEXP:
-CODE: FOO
-OK
-FOO
+REGEXP:    hello
 ';
 
 
@@ -26,7 +12,7 @@ grammar Foo {
   }
 
   rule REGEXP {
-     \s* 'REGEXP:' \s*
+     \s* 'REGEXP:' \s ** ^1..5 (\w+) \s*
   }
 
   proto token value {*};
@@ -38,5 +24,14 @@ grammar Foo {
 
 }
 
-say Foo.parse($s);
+class Actions {
+
+  #method TOP($/) {  say "OK"}
+  method CODE($/) { say "CODE " ~ $/ }
+  method REGEXP($/) { say "REGEXP> " ~ $/ ~ '<' }
+
+}
+
+
+Foo.parse($s,actions => Actions).made;
 
