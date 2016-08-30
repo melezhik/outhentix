@@ -1,4 +1,12 @@
-grammar Outhentix::DSL {
-  token TOP { .* };
+grammar Outhentix::DSL::Grammar {
+
+  token TOP {
+    \s* 'CODE: <<FOO' \s* (.*?) \s* 'FOO' \s*
+  }
+
+}
+
+class Outhentix::DSL::Actions {
+
 }
 

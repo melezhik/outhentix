@@ -22,9 +22,9 @@ class Outhentix {
   has Hash $.stream;
 
   method parse ($check-list) {
-    my $o = Outhentix::DSL.parse($check-list);
+    my $o = Outhentix::DSL::Grammar.parse( $check-list );
     unless $o {
-      die "failed to parse check list";
+      die "failed to parse check list!";
     }
     return $o.made;
   }
