@@ -2,10 +2,7 @@ use v6;
 
 
 use Outhentix::Context;
-
-grammar Otx::DSL {
-  token TOP { .* };
-}
+use Outhentix::DSL;
 
 class Outhentix {
 
@@ -25,7 +22,7 @@ class Outhentix {
   has Hash $.stream;
 
   method parse ($check-list) {
-    my $o = Otx::DSL.parse($check-list);
+    my $o = Outhentix::DSL.parse($check-list);
     unless $o {
       die "failed to parse check list";
     }
