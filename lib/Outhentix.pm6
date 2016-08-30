@@ -3,6 +3,10 @@ use v6;
 
 use Outhentix::Context;
 
+grammar Otx::DSL {
+  token TOP { .* };
+}
+
 class Outhentix {
 
   has Array @.results;
@@ -10,36 +14,25 @@ class Outhentix {
   has Array @.current-context;
   has Outhentix::Context $.context-modificator;
   has Bool $.has-context = False;
-}
+  has Array @.succeed;
+  has Array @.captures;
+  has Str $.last-match-line;
+  has Bool $.last-check-status;
+  has Bool $.debug-mode = False;
+  has Str $.output;
+  has Int $.match-l = 40;
+  has Hash $.languages;
+  has Hash $.stream;
 
-
-#`{
-
-    my $class = shift;
-    my $output = shift;
-    my $opts = shift || {};
-
-    bless {
-        results => [],
-        original_context => [],
-        current_context => [],
-        context_modificator => Outthentic::DSL::Context::Default->new(),
-        has_context => 0,
-        succeeded => [],
-        captures => [],
-        within_mode => 0,
-        block_mode => 0,
-        last_match_line => undef,
-        last_check_status => undef,
-        debug_mod => 0,
-        output => $output||'',
-        match_l => 40,
-        stream => {},
-        languages => {},
-        %{$opts},
-    }, __PACKAGE__;
-
+  method parse ($check-list) {
+    my $o = Otx::DSL.parse($check-list);
+    unless $o {
+      die "failed to parse check list";
+    }
+    return $o.made;
+  }
 
 }
+
 
 
