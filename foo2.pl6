@@ -1,26 +1,15 @@
 my $s = '
 REGEXP:    hello
-10
 ';
 
 
 grammar Foo {
-
-  token TOP { <regexp> | <digit> }
-
-  rule regexp {
-     \s* 'REGEXP:' \s* (\w+) \s*
-  }
-
-  rule digit {
-    \d
-  }
-
+  token TOP { <regexp> }
+  token regexp { \s* 'REGEXP:' \s+ (\w+) \s* }
 }
 
 class Actions {
-  method regexp($/) {  say "regexp <" ~ $/ ~ '>'}
-  method digit($/) {  say "digit <" ~ $/ ~ '>'}
+  method TOP($/) {  say "TOP <" ~ $/ ~ '>'}
 }
 
 

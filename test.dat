@@ -1,0 +1,9 @@
+regexp: foo
+
+code: bar
+1
+2
+3
+bar
+
+regexp: foo
