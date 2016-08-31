@@ -13,16 +13,15 @@ class Outhentix {
   has Bool $.has-context = False;
   has Bool $.within-mode = False;
   has Bool $.block-mode = False;
-  has Array @.succeed;
+  has Array @.succeeded;
   has Array @.captures;
   has Str $.last-match-line;
   has Bool $.last-check-status;
-  has Bool $.debug-mode = False;
   has Str $.output;
   has Int $.match-l = 40;
   has Hash $.languages;
   has Hash $.stream;
-  has Int $.debug-mod = 0;
+  has Int $.debug-mode = 0;
 
   method !add-result (%item) {
     %item<type> = 'check_expression';
@@ -36,9 +35,9 @@ class Outhentix {
 
   method !reset-context {
   
-      @!current_context = @!original-context;
+      @!current-context = @!original-context;
   
-      self!add-debug-result('reset search context') if $!debug_mod >= 2;
+      self!add-debug-result('reset search context') if $!debug-mode >= 2;
   
       $.context-modificator = Outthentic::DSL::Context::Default.new();
   
@@ -62,14 +61,14 @@ class Outhentix {
 
           @context.push: [$l, $i];
   
-          self!add-debug-result("[oc] [$l, $i]") if $!debug-mod >= 2;
+          self!add-debug-result("[oc] [$l, $i]") if $!debug-mode >= 2;
   
       }
   
       @!original-context = @!current-context = @context;
   
   
-      self!add-debug-result('context populated') if $!debug-mod >= 2;
+      self!add-debug-result('context populated') if $!debug-mode >= 2;
   
   
       $!has-context = True;
@@ -87,6 +86,8 @@ class Outhentix {
 
   method !handle-within ($re) { }
 
+  method !handle-plain ($str) { }
+
   method validate ($check-list) {
 
     return;
@@ -103,7 +104,7 @@ class Outhentix {
 
         my $l = $ll.chomp;
 
-        self!add-debug-result("[dsl] $l") if $!debug-mod >= 2;
+        self!add-debug-result("[dsl] $l") if $!debug-mode >= 2;
 
         next LINE unless $l ~~ m/\S/;    # skip blank lines
 
@@ -115,19 +116,19 @@ class Outhentix {
 
               $here-str-mode = False; 
 
-              self!add-debug-result("here string mode off") if $!debug-mod >= 2;
+              self!add-debug-result("here string mode off") if $!debug-mode >= 2;
 
             }
 
         }
 
-        if $l ~~ m/^\s*begin:\s*$/) { # begining  of the text block
+        if $l ~~ m/^\s*begin:\s*$/ { # begining  of the text block
 
             die "you can't switch to text block mode when within mode is enabled" if $!within-mode;
 
             $!context-modificator = Outthentic::DSL::Context::TextBlock.new();
 
-            self!add-debug-result('begin block start') if $!debug-mod >= 2;
+            self!add-debug-result('begin block start') if $!debug-mode >= 2;
 
             $!block-mode = True;
 
@@ -142,12 +143,12 @@ class Outhentix {
 
             self!reset-context();
 
-            self!add-debug-result('text block end') if $!debug_mod >= 2;
+            self!add-debug-result('text block end') if $!debug-mode >= 2;
 
             next LINE;
         }
 
-        if ($l=~ /^\s*reset_context:\s*$/) {
+        if $l ~~ m/^\s*reset_context:\s*$/ {
 
             self!reset-context();
 
@@ -158,7 +159,7 @@ class Outhentix {
 
             my $status = $0; my $message = $1;
 
-            self!add-debug-result("assert found: $status , $message") if $!debug-mod >= 2;
+            self!add-debug-result("assert found: $status , $message") if $!debug-mode >= 2;
 
             $status = False if $status eq 'false'; # ruby to perl6 conversion
 
@@ -183,14 +184,14 @@ class Outhentix {
         }
 
         # validate unterminated multiline blocks or here strings
-        if ($l ~~ m/^\s*(regexp|code|generator|within|validator):\s*.*/){
+        if $l ~~ m/^\s*(regexp|code|generator|within|validator):\s*.*/ {
 
             die "unterminated multiline block or here string found, last line: " ~ ( @multiline-block.pop ) 
             if $block-type.defined;
 
         }
 
-        if $l ~~ /^\s*code:\s*(.*)/  { # `code:' line
+        if $l ~~ m/^\s*code:\s*(.*)/  { # `code:' line
 
             my $code = $0;
 
@@ -202,7 +203,7 @@ class Outhentix {
 
                  next LINE; # this is multiline block, accumulate lines until meet '\' line
 
-            } elsif $code ~~s/<<(\S+)// ){
+            } elsif $code ~~s/<<(\S+)// {
 
                 $here-str-mode = True;
 
@@ -210,7 +211,7 @@ class Outhentix {
 
                 $block-type = 'code';
 
-                self!add-debug-result("code block start. heredoc marker: $here-str-marker") if $!debug_mod  >= 2;
+                self!add-debug-result("code block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
 
                 next LINE;
 
@@ -222,13 +223,13 @@ class Outhentix {
 
             }
 
-        } elsif $l ~~ /^\s*validator:\s*(.*)/) { # `validator' line
+        } elsif $l ~~ /^\s*validator:\s*(.*)/ { # `validator' line
 
             my $code = $0;
 
-            if  $code=~s/\\\s*$// {
+            if  $code ~~ s/\\\s*$// {
 
-                 @multiline-block.push $code;
+                 @multiline-block.push: $code;
 
                  $block-type = 'validator';
 
@@ -242,7 +243,7 @@ class Outhentix {
 
                 $block-type = 'validator';
 
-                self!add-debug-result("validator block start. heredoc marker: $here-str-marker") if $!debug_mod  >= 2;
+                self!add-debug-result("validator block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
 
                 next LINE;
 
@@ -259,7 +260,7 @@ class Outhentix {
 
             if  $code ~~ s/\\\s*$// {
 
-                 @multiline-block.push $code;
+                 @multiline-block.push: $code;
 
                  $block-type = 'generator';
 
@@ -273,7 +274,7 @@ class Outhentix {
 
                 $block-type = 'generator';
 
-                self!add-debug-result("generator block start. heredoc marker: $here-str-marker") if $!debug_mod  >= 2;
+                self!add-debug-result("generator block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
 
                 next LINE;
 
@@ -293,7 +294,7 @@ class Outhentix {
 
         } elsif $l ~~ /^\s*within:\s*(.*)/ {
 
-            die "you can't switch to within mode when text block mode is enabled" if $!block_mode;
+            die "you can't switch to within mode when text block mode is enabled" if $!block-mode;
 
             my $re = $0;
 
@@ -303,7 +304,7 @@ class Outhentix {
 
              if ( $l ~~ s/\\\s*$// or $here-str-mode ) {
 
-                @multiline-block:push $l;
+                @multiline-block.push: $l;
 
                 next LINE; # this is multiline block or here string, 
                            # accumulate lines until meet line not ending with '\' ( for multiline blocks )
@@ -313,11 +314,11 @@ class Outhentix {
 
                 # the end of multiline block or here string
 
-                my $name = "handle_"; 
+                my $name = "handle-"; 
                 $name ~= $block-type;
-                @multiline-block:push $l;
+                @multiline-block.push: $l;
 
-                self!<$name>(@multiline-block.join '');
+                self!<$name>(@multiline-block.join(''));
 
                 # flush mulitline block data:
                 $block-type = Nil;
@@ -326,8 +327,11 @@ class Outhentix {
             }
        } else { # `plain string' line
 
-            s{\s+#.*}[], s{\s+$}[], s{^\s+}[] for $l;
-            $self->handle_plain($l);
+            $l ~~ s/\s+\#.*//; 
+
+            $l ~~ s/^\s+//;
+
+            self!handle-plain($l);
 
         }
     }
