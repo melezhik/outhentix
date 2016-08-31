@@ -3,8 +3,10 @@
   "version"     : "*",
   "description" : "Text validator DSL",
   "authors" : [ "Alexey Melezhik"],
-  "depends"     : [
-                  ],
+  "depends" : [
+                    "Terminal::ANSIColor",
+                    "JSON::Tiny"
+              ],
   "source-type" : "git",
   "support" : {
         "bugtracker" : "https://github.com/melezhik/outhentix/issues",

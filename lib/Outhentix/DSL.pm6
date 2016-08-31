@@ -1,3 +1,5 @@
+use Terminal::ANSIColor;
+
 grammar Outhentix::DSL::Grammar {
 
   token TOP { <otx>+ }
