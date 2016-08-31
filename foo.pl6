@@ -2,7 +2,7 @@ grammar Thing {
     token TOP { <check>+ }
     proto regex check {*}
     token check:sym<regexp> { <sym> ':' \s* (\N*)\n }
-    token check:sym<code> { \s* <sym> ':' \s+ (\w+) .*? $0 \s* }
+    token check:sym<code> { \s* <sym> ':' \s+ (\w+) .*? ^^$0$$ \s* }
 }
 
 class Actions {

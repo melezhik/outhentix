@@ -7,3 +7,12 @@ code: bar
 bar
 
 regexp: foo
+
+code: bar
+11
+22
+33
+
+regexp: foo
+
+bar
