@@ -6,21 +6,21 @@ use Outhentix::DSL;
 
 class Outhentix {
 
-  has Array @.results;
-  has Array @.original-context;
-  has Array @.current-context;
+  has @.results;
+  has @.original-context;
+  has @.current-context;
   has Outhentix::Context $.context-modificator;
   has Bool $.has-context = False;
   has Bool $.within-mode = False;
   has Bool $.block-mode = False;
-  has Array @.succeeded;
-  has Array @.captures;
+  has @.succeeded;
+  has @.captures;
   has Str $.last-match-line;
   has Bool $.last-check-status;
   has Str $.output;
   has Int $.match-l = 40;
-  has Hash $.languages;
-  has Hash $.stream;
+  has %.languages;
+  has %.stream;
   has Int $.debug-mode = 0;
 
   method !add-result (%item) {
@@ -29,7 +29,7 @@ class Outhentix {
   }
 
   method !add-debug-result ($msg) {
-    #@!results.push: ({ type => 'debug', message => $msg });
+    @!results.push: { type => 'debug', message => $msg };
     say $msg;
   }
 

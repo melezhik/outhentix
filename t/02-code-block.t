@@ -16,3 +16,5 @@ FOO
 regexp: /OK/
 hello world
 HERE
+
+say $otx.results[0].WHAT;
