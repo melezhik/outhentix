@@ -6,7 +6,7 @@ plan 2;
 
 ok 1, 'Module loaded';
 my $otx = Outhentix.new;
-lives-ok( { $otx.parse(q:to/HERE/) }, 'parsed code block');
+lives-ok( { $otx.validate(q:to/HERE/) }, 'code block');
 HELLO WORLD
 code: <<FOO
   $a=1;

@@ -5,4 +5,4 @@ plan 2;
 ok 1, 'Module loaded';
 
 my $otx = Outhentix.new;
-lives-ok { $otx.parse('OK') }, "OK parsed";
+lives-ok { $otx.validate('OK') }, "OK validated";

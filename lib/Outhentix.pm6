@@ -21,8 +21,14 @@ class Outhentix {
   has Hash $.languages;
   has Hash $.stream;
 
-  method parse ($check-list) {
+  method validate ($check-list) {
     return 1;
+  }
+
+
+  method add_result (%item) {
+    %item<type> = 'check_expression';
+    @!results.push: %item;
   }
 
 }
