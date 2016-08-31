@@ -5,7 +5,7 @@ use Outhentix;
 plan 2;
 
 ok 1, 'Module loaded';
-my $otx = Outhentix.new;
+my $otx = Outhentix.new( debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0);
 lives-ok( { $otx.validate(q:to/HERE/) }, 'code block');
 HELLO WORLD
 code: <<FOO
@@ -16,4 +16,3 @@ FOO
 regexp: /OK/
 hello world
 HERE
-

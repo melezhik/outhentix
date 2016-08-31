@@ -28,9 +28,9 @@ class Outhentix {
     @!results.push: %item;
   }
 
-  method !add-debug-result (%item) {
-    %item<type> = 'debug';
-    @!results.push: %item;
+  method !add-debug-result ($msg) {
+    #@!results.push: ({ type => 'debug', message => $msg });
+    say $msg;
   }
 
   method !reset-context {
@@ -89,8 +89,6 @@ class Outhentix {
   method !handle-plain ($str) { }
 
   method validate ($check-list) {
-
-    return;
 
     my @lines;
     my $block-type;
@@ -318,7 +316,7 @@ class Outhentix {
                 $name ~= $block-type;
                 @multiline-block.push: $l;
 
-                self!<$name>(@multiline-block.join(''));
+                self!"$name"(@multiline-block.join(''));
 
                 # flush mulitline block data:
                 $block-type = Nil;
