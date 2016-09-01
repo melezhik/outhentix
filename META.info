@@ -4,17 +4,15 @@
   "description" : "Text validator DSL",
   "authors" : [ "Alexey Melezhik"],
   "depends" : [
-                    "Terminal::ANSIColor",
-                    "JSON::Tiny"
               ],
   "source-type" : "git",
   "support" : {
-        "bugtracker" : "https://github.com/melezhik/outhentix/issues",
-        "source" : "https://github.com/melezhik/outhentix.git"
+        "bugtracker" : "https://github.com/melezhik/outhentix-dsl/issues",
+        "source" : "https://github.com/melezhik/outhentix-dsl.git"
     },
    "provides" : {
-        "Outhentix" : "lib/Outhentix.pm6",
-        "Outhentix::Context" : "lib/Outhentix/Context.pm6"
+        "Outhentix::DSL" : "lib/Outhentix/DSL.pm6",
+        "Outhentix::DSL::Context" : "lib/Outhentix/DSL/Context.pm6"
   },
-  "source-url"  : "https://github.com/melezhik/outhentix.git"
+  "source-url"  : "https://github.com/melezhik/outhentix-dsl.git"
 }
