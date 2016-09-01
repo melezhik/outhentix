@@ -187,17 +187,17 @@ class Outhentix::DSL {
 
         }
 
-        if $l ~~ m/^\s*code:\s*(.*)/  { # `code:' line
+        if $l ~~ m/^\s*(code|generator|validator):\s*(.*)/  { # `code:' line
 
-            my $code = $0;
+            my $block-type = $0;
+
+            my $code = $1;
 
             if $code ~~ s/\\\s*$// {
 
                  @multiline-block.push: $code;
 
-                 $block-type = 'code';
-
-                 self!debug("code block start.") if $!debug-mode  >= 2;
+                 self!debug("$block-type block start.") if $!debug-mode  >= 2;
 
                  next LINE; # this is multiline block, accumulate lines until meet '\' line
 
@@ -207,9 +207,7 @@ class Outhentix::DSL {
 
                 $here-str-marker = $0;
 
-                $block-type = 'code';
-
-                self!debug("code block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
+                self!debug("$block-type block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
 
                 next LINE;
 
@@ -217,70 +215,8 @@ class Outhentix::DSL {
 
                 $block-type = Nil;
 
-                self!handle-code($code);
+                self!"handle-$block-type"($code);
 
-            }
-
-        } elsif $l ~~ /^\s*validator:\s*(.*)/ { # `validator' line
-
-            my $code = $0;
-
-            if  $code ~~ s/\\\s*$// {
-
-                 @multiline-block.push: $code;
-
-                 $block-type = 'validator';
-
-                 next LINE; # this is multiline block, accumulate lines until meet '\' line
-
-            } elsif $code ~~ s/<<(\S+)// {
-
-                $here-str-mode = True;
-
-                $here-str-marker = $0;
-
-                $block-type = 'validator';
-
-                self!debug("validator block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
-
-                next LINE;
-
-            } else {
-
-                $block-type = Nil;
-
-                self!handle-validator($code);
-            }
-
-        }elsif $l ~~ /^\s*generator:\s*(.*)/ { # `generator' line
-
-            my $code = $0;
-
-            if  $code ~~ s/\\\s*$// {
-
-                 @multiline-block.push: $code;
-
-                 $block-type = 'generator';
-
-                 next LINE; # this is multiline block, accumulate lines until meet '\' line
-
-            } elsif $code ~~ s/<<(\S+)// {
-
-                $here-str-mode = True;
-
-                $here-str-marker = $0;
-
-                $block-type = 'generator';
-
-                self!debug("generator block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
-
-                next LINE;
-
-            } else {
-
-                $block-type = Nil;
-
-                self!handle-generator($code);
 
             }
 
