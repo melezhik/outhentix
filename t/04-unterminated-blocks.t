@@ -2,8 +2,6 @@ use v6;
 use Test;
 use Outhentix::DSL;
 
-plan 2;
-
 ok 1, 'Module loaded';
 
 my $otx = Outhentix::DSL.new( debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0);
@@ -21,10 +19,18 @@ HERE
 
 CATCH { 
   when Outhentix::DSL::Error::UnterminatedBlock { 
+    my $ex = $_;
     ok True, 'unterminated block error catched'; 
+    like $ex.message, /.*'last line:'\s+'[$a,$b]'/;
   };
 
   default {
     ok False, 'unterminated block error catched';
   };
-} 
+
+}
+
+LEAVE {
+  done-testing;
+}
+
