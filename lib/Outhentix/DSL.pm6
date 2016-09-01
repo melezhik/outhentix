@@ -2,6 +2,7 @@ use v6;
 
 
 use Outhentix::DSL::Context;
+use Outhentix::DSL::Error::UnterminatedBlock;
 
 class Outhentix::DSL {
 
@@ -182,9 +183,9 @@ class Outhentix::DSL {
 
         # validate unterminated multiline blocks or here strings
         if $l ~~ m/^\s*(regexp|code|generator|within|validator):\s*.*/ && $block-type.defined {
-
-            die "unterminated multiline block found, last line: " ~ ( @multiline-block.pop ) 
-
+            Outhentix::DSL::Error::UnterminatedBlock.new( message => 
+              "unterminated multiline block found!, last line: " ~ ( @multiline-block.pop )
+            ).throw;
         }
 
         if $l ~~ m/^\s*(code|generator|validator):\s*(.*)/  { # `<block>:' line
@@ -272,9 +273,12 @@ class Outhentix::DSL {
         }
     }
 
-    die "unterminated multiline block found, last line: " ~ ( @multiline-block.pop ) if $block-type.defined;
+    if $block-type.defined {
+            Outhentix::DSL::Error::UnterminatedBlock.new( message => 
+              "unterminated multiline block found at the end of file!, last line: " ~ ( @multiline-block.pop )
+            ).throw;
+    }
   
-
   }
   
 }
