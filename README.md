@@ -4,7 +4,7 @@ Outhentix is a future replacement of Outthentic::DSL. I am going to rewrite all 
 scratch using Perl6. Meanwhile follow [Outthentic::DSL](https://github.com/melezhik/outthentic-dsl)
 to understand what Outhentix is.
 
-[![Build Status](https://travis-ci.org/melezhik/outhentix.svg)](https://travis-ci.org/melezhik/outhentix)
+[![Build Status](https://travis-ci.org/melezhik/outhentix-dsl.svg)](https://travis-ci.org/melezhik/outhentix-dsl)
 
 # INSTALL
     

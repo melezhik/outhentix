@@ -27,8 +27,7 @@ class Outhentix::DSL {
     @!results.push: %item;
   }
 
-  method !add-debug-result ($msg) {
-    @!results.push: { type => 'debug', message => $msg };
+  method !debug ($msg) {
     say $msg;
   }
 
@@ -36,7 +35,7 @@ class Outhentix::DSL {
   
       @!current-context = @!original-context;
   
-      self!add-debug-result('reset search context') if $!debug-mode >= 2;
+      self!debug('reset search context') if $!debug-mode >= 2;
   
       $.context-modificator = Outthentic::DSL::Context::Default.new();
   
@@ -60,14 +59,14 @@ class Outhentix::DSL {
 
           @context.push: [$l, $i];
   
-          self!add-debug-result("[oc] [$l, $i]") if $!debug-mode >= 2;
+          self!debug("[oc] [$l, $i]") if $!debug-mode >= 2;
   
       }
   
       @!original-context = @!current-context = @context;
   
   
-      self!add-debug-result('context populated') if $!debug-mode >= 2;
+      self!debug('context populated') if $!debug-mode >= 2;
   
   
       $!has-context = True;
@@ -101,7 +100,7 @@ class Outhentix::DSL {
 
         my $l = $ll.chomp;
 
-        self!add-debug-result("[dsl] $l") if $!debug-mode >= 2;
+        self!debug("[dsl] $l") if $!debug-mode >= 2;
 
         next LINE unless $l ~~ m/\S/;    # skip blank lines
 
@@ -113,7 +112,7 @@ class Outhentix::DSL {
 
               $here-str-mode = False; 
 
-              self!add-debug-result("here string mode off") if $!debug-mode >= 2;
+              self!debug("here string mode off") if $!debug-mode >= 2;
 
             }
 
@@ -125,7 +124,7 @@ class Outhentix::DSL {
 
             $!context-modificator = Outthentic::DSL::Context::TextBlock.new();
 
-            self!add-debug-result('begin block start') if $!debug-mode >= 2;
+            self!debug('begin block start') if $!debug-mode >= 2;
 
             $!block-mode = True;
 
@@ -140,7 +139,7 @@ class Outhentix::DSL {
 
             self!reset-context();
 
-            self!add-debug-result('text block end') if $!debug-mode >= 2;
+            self!debug('text block end') if $!debug-mode >= 2;
 
             next LINE;
         }
@@ -156,7 +155,7 @@ class Outhentix::DSL {
 
             my $status = $0; my $message = $1;
 
-            self!add-debug-result("assert found: $status , $message") if $!debug-mode >= 2;
+            self!debug("assert found: $status , $message") if $!debug-mode >= 2;
 
             $status = False if $status eq 'false'; # ruby to perl6 conversion
 
@@ -208,7 +207,7 @@ class Outhentix::DSL {
 
                 $block-type = 'code';
 
-                self!add-debug-result("code block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
+                self!debug("code block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
 
                 next LINE;
 
@@ -240,7 +239,7 @@ class Outhentix::DSL {
 
                 $block-type = 'validator';
 
-                self!add-debug-result("validator block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
+                self!debug("validator block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
 
                 next LINE;
 
@@ -271,7 +270,7 @@ class Outhentix::DSL {
 
                 $block-type = 'generator';
 
-                self!add-debug-result("generator block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
+                self!debug("generator block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
 
                 next LINE;
 
