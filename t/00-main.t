@@ -9,4 +9,4 @@ ok my $otx = Outhentix::DSL.new, 'instance of Outhentix::DSL created';
 isa-ok $otx, 'Outhentix::DSL';
 isa-ok $otx.has-context, 'Bool';
 ok ! $otx.has-context, 'has-context is false be default';
-diag $otx.perl;
+

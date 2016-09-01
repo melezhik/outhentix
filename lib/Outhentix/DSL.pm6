@@ -197,6 +197,8 @@ class Outhentix::DSL {
 
                  $block-type = 'code';
 
+                 self!debug("code block start.") if $!debug-mode  >= 2;
+
                  next LINE; # this is multiline block, accumulate lines until meet '\' line
 
             } elsif $code ~~s/<<(\S+)// {
@@ -313,6 +315,8 @@ class Outhentix::DSL {
                 my $name = "handle-"; 
                 $name ~= $block-type;
                 @multiline-block.push: $l;
+
+                self!debug("$block-type block end.") if $!debug-mode  >= 2;
 
                 self!"$name"(@multiline-block.join(''));
 
