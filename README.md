@@ -9,7 +9,14 @@ to understand what Outhentix is.
 # INSTALL
     
     $ panda install Outhentix
-    
+
+# Developing
+
+    $ git clone https://travis-ci.org/melezhik/outhentix-dsl 
+    $ cd outhentix-dsl
+    $ OTX_DEBUG=2 prove -e 'perl6 -I lib' -v -r t/
+    $ panda --force install .
+
 # Author
 
 [Alexey Melezhik](mailto:melezhik@gmail.com)
