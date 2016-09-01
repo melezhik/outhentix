@@ -100,6 +100,7 @@ class Outhentix::DSL {
 
         my $l = $ll.chomp;
 
+        self!debug("[type] " ~ ($block-type || 'not set') ) if $!debug-mode >= 2;
         self!debug("[dsl] $l") if $!debug-mode >= 2;
 
         next LINE unless $l ~~ m/\S/;    # skip blank lines
@@ -180,16 +181,15 @@ class Outhentix::DSL {
         }
 
         # validate unterminated multiline blocks or here strings
-        if $l ~~ m/^\s*(regexp|code|generator|within|validator):\s*.*/ {
+        if $l ~~ m/^\s*(regexp|code|generator|within|validator):\s*.*/ && $block-type.defined {
 
-            die "unterminated multiline block or here string found, last line: " ~ ( @multiline-block.pop ) 
-            if $block-type.defined;
+            die "unterminated multiline block found, last line: " ~ ( @multiline-block.pop ) 
 
         }
 
-        if $l ~~ m/^\s*(code|generator|validator):\s*(.*)/  { # `code:' line
+        if $l ~~ m/^\s*(code|generator|validator):\s*(.*)/  { # `<block>:' line
 
-            my $block-type = $0;
+            $block-type = $0;
 
             my $code = $1;
 
@@ -211,12 +211,11 @@ class Outhentix::DSL {
 
                 next LINE;
 
-            }else{
+            }else {
 
                 $block-type = Nil;
 
                 self!"handle-$block-type"($code);
-
 
             }
 
@@ -234,10 +233,11 @@ class Outhentix::DSL {
 
             self!handle-within($re);
 
-        } elsif $block-type.defined { # multiline block
+        } elsif $block-type { # multiline block
 
              if ( $l ~~ s/\\\s*$// or $here-str-mode ) {
 
+                self!debug("\tpush $l to $block-type ...") if $!debug-mode  >= 2;
                 @multiline-block.push: $l;
 
                 next LINE; # this is multiline block or here string, 
@@ -272,8 +272,7 @@ class Outhentix::DSL {
         }
     }
 
-      die "unterminated multiline block or here string found, last line: " ~ ( @multiline-block.pop ) 
-      if $block-type.defined;
+    die "unterminated multiline block found, last line: " ~ ( @multiline-block.pop ) if $block-type.defined;
   
 
   }
