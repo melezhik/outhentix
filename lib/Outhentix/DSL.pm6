@@ -1,6 +1,5 @@
 use v6;
 
-use Outhentix::DSL::Context;
 use Outhentix::DSL::Context::Range;
 use Outhentix::DSL::Context::TextBlock;
 use Outhentix::DSL::Context::Default;
