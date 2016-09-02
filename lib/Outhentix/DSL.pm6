@@ -1,6 +1,5 @@
 use v6;
 
-
 use Outhentix::DSL::Context;
 use Outhentix::DSL::Error::UnterminatedBlock;
 
@@ -108,19 +107,42 @@ class Outhentix::DSL {
 
         next LINE if $l ~~ m/^\s*\#.*/;  # skip comments
         
-        if $here-str-mode {
+        if $here-str-mode && $l ~~ s/^$here-str-marker\s*$// {
 
-            if $l ~~ s/^$here-str-marker\s*$// {
+          $here-str-mode = False; 
 
-              $here-str-mode = False; 
+          self!debug("here string mode off") if $!debug-mode >= 2;
 
-              self!debug("here string mode off") if $!debug-mode >= 2;
+        } elsif $block-type { # multiline block
+
+             if ( $l ~~ s/\\\s*$// or $here-str-mode ) {
+
+               # this is multiline block or here string, 
+               # accumulate lines until meet line not ending with '\' ( for multiline blocks )
+               # or here string end marker ( for here stings )
+
+               self!debug("\tpush $l to $block-type ...") if $!debug-mode  >= 2;
+               @multiline-block.push: $l;
+
+             } else {
+
+                # the end of multiline block or here string
+
+                my $name = "handle-"; 
+                $name ~= $block-type;
+                @multiline-block.push: $l;
+
+                self!debug("$block-type block end.") if $!debug-mode  >= 2;
+
+                self!"$name"(@multiline-block.join(''));
+
+                # flush mulitline block data:
+                $block-type = Nil;
+                @multiline-block = Array.new;
 
             }
-
-        }
-
-        if $l ~~ m/^\s*begin:\s*$/ { # begining  of the text block
+      
+        } elsif $l ~~ m/^\s*begin:\s*$/ { # begining  of the text block
 
             die "you can't switch to text block mode when within mode is enabled" if $!within-mode;
 
@@ -132,10 +154,7 @@ class Outhentix::DSL {
 
             @!succeeded = Array.new;
 
-            next LINE;
-        }
-
-        if ($l ~~ m/^\s*end:\s*$/) { # end of the text block
+        } elsif ($l ~~ m/^\s*end:\s*$/) { # end of the text block
 
             $!block-mode = False;
 
@@ -143,17 +162,13 @@ class Outhentix::DSL {
 
             self!debug('text block end') if $!debug-mode >= 2;
 
-            next LINE;
         }
 
         if $l ~~ m/^\s*reset_context:\s*$/ {
 
             self!reset-context();
 
-            next LINE;
-        }
-
-        if ($l ~~ m/^\s*assert:\s(\S+)\s+(.*)$/) {
+        } elsif ($l ~~ m/^\s*assert:\s(\S+)\s+(.*)$/) {
 
             my $status = $0; my $message = $1;
 
@@ -165,30 +180,14 @@ class Outhentix::DSL {
 
             self!add-result({ status => $status , message => $message });
 
-            next LINE;
-
-        }
-
-        if ($l ~~ m/^\s*between:\s+(.*)/) { # range context
+        } elsif ($l ~~ m/^\s*between:\s+(.*)/) { # range context
             
             $!context-modificator = Outthentic::DSL::Context::Range.new($0);
 
             die "you can't switch to range context mode when within mode is enabled" if $!within-mode;
 
             die "you can't switch to range context mode when block mode is enabled" if $!block-mode;
-
-
-            next LINE;
-        }
-
-        # validate unterminated multiline blocks or here strings
-        if $l ~~ m/^\s*(regexp|code|generator|within|validator):\s*.*/ && $block-type.defined {
-            Outhentix::DSL::Error::UnterminatedBlock.new( message => 
-              "unterminated multiline block found!, last line: " ~ ( @multiline-block.pop )
-            ).throw;
-        }
-
-        if $l ~~ m/^\s*(code|generator|validator):\s*(.*)/  { # `<block>:' line
+        } elsif $l ~~ m/^\s*(code|generator|validator):\s*(.*)/  {
 
             $block-type = $0;
 
@@ -196,11 +195,11 @@ class Outhentix::DSL {
 
             if $code ~~ s/\\\s*$// {
 
+                 # this is multiline block, accumulate lines until meet '\' line
+
                  @multiline-block.push: $code;
 
                  self!debug("$block-type block start.") if $!debug-mode  >= 2;
-
-                 next LINE; # this is multiline block, accumulate lines until meet '\' line
 
             } elsif $code ~~s/<<(\S+)// {
 
@@ -210,9 +209,8 @@ class Outhentix::DSL {
 
                 self!debug("$block-type block start. heredoc marker: $here-str-marker") if $!debug-mode  >= 2;
 
-                next LINE;
 
-            }else {
+            } else {
 
                 $block-type = Nil;
 
@@ -234,35 +232,7 @@ class Outhentix::DSL {
 
             self!handle-within($re);
 
-        } elsif $block-type { # multiline block
-
-             if ( $l ~~ s/\\\s*$// or $here-str-mode ) {
-
-                self!debug("\tpush $l to $block-type ...") if $!debug-mode  >= 2;
-                @multiline-block.push: $l;
-
-                next LINE; # this is multiline block or here string, 
-                           # accumulate lines until meet line not ending with '\' ( for multiline blocks )
-                           # or here string end marker ( for here stings )
-
-             } else {
-
-                # the end of multiline block or here string
-
-                my $name = "handle-"; 
-                $name ~= $block-type;
-                @multiline-block.push: $l;
-
-                self!debug("$block-type block end.") if $!debug-mode  >= 2;
-
-                self!"$name"(@multiline-block.join(''));
-
-                # flush mulitline block data:
-                $block-type = Nil;
-                @multiline-block = Array.new;
-
-            }
-       } else { # `plain string' line
+        } else { # `plain string' line
 
             $l ~~ s/\s+\#.*//; 
 
@@ -274,9 +244,9 @@ class Outhentix::DSL {
     }
 
     if $block-type.defined {
-            Outhentix::DSL::Error::UnterminatedBlock.new( message => 
-              "unterminated multiline block found at the end of file!, last line: " ~ ( @multiline-block.pop )
-            ).throw;
+      Outhentix::DSL::Error::UnterminatedBlock.new( message => 
+        "Unterminated multiline block found. Last line: " ~ ( @multiline-block.pop )
+      ).throw;
     }
   
   }
