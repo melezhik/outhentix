@@ -1,6 +1,9 @@
 use v6;
 
 use Outhentix::DSL::Context;
+use Outhentix::DSL::Context::Range;
+use Outhentix::DSL::Context::TextBlock;
+use Outhentix::DSL::Context::Default;
 use Outhentix::DSL::Error::UnterminatedBlock;
 
 class Outhentix::DSL {
@@ -8,7 +11,7 @@ class Outhentix::DSL {
   has @.results;
   has @.original-context;
   has @.current-context;
-  has Outhentix::DSL::Context $.context-modificator;
+  has $.context-modificator = Outhentix::DSL::Context::Default.new();
   has Bool $.has-context = False;
   has Bool $.within-mode = False;
   has Bool $.block-mode = False;
