@@ -21,7 +21,7 @@ CATCH {
   when Outhentix::DSL::Error::UnterminatedBlock { 
     my $ex = $_;
     ok True, 'unterminated block error catched'; 
-    like $ex.message, /.*'last line:'\s+'[$a,$b]'/;
+    like $ex.message, /.*'last line:'\s+'[$a,$b]'/, 'correct error message';
   };
 
   default {
