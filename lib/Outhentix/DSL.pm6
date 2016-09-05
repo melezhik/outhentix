@@ -27,7 +27,7 @@ class Outhentix::DSL {
   has Str $.cache-dir = %*ENV<OTX_CACHE_DIR> ?? %*ENV<OTX_CACHE_DIR>.Str !! '/tmp';
 
   method !add-result (%item) {
-    %item<type> = 'check_expression';
+    %item<type> = 'check-expression';
     @!results.push: %item;
   }
 
@@ -124,7 +124,7 @@ class Outhentix::DSL {
   method !handle-validator ($code) { 
 
     my @result = self!handle-code($code).lines;
-    
+    self!add-result %( status => @result[0], message => @result[1] );    
 
   }
 
