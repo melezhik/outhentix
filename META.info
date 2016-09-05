@@ -13,7 +13,9 @@
     },
    "provides" : {
         "Outhentix::DSL" : "lib/Outhentix/DSL.pm6",
-        "Outhentix::DSL::Context" : "lib/Outhentix/DSL/Context.pm6"
-  },
+        "Outhentix::DSL::Context::Range" : "lib/Outhentix/DSL/Context/Range.pm6",
+        "Outhentix::DSL::Context::TextBlock" : "lib/Outhentix/DSL/Context/TextBlock.pm6",
+        "Outhentix::DSL::Context::Default" : "lib/Outhentix/DSL/Context/Default.pm6"
+   },
   "source-url"  : "https://github.com/melezhik/outhentix-dsl.git"
 }
