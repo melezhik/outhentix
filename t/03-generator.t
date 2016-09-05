@@ -7,25 +7,34 @@ plan 3;
 ok 1, 'Module loaded';
 
 my $otx = Outhentix::DSL.new( debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0);
-lives-ok( { $otx.validate(q:to/HERE/) }, 'generator block');
+lives-ok( { $otx.validate(q:to/HERE/) }, 'generator block here string');
 HELLO WORLD
 generator: <<FOO
-!perl
-  $a=1;
-  $b=2;
-  [$a,$b]
+  my $a=1;
+  my $b=2;
+  [$a,$b];
 FOO
 regexp: \d OK
 hello world
 HERE
 
-$otx = Outhentix::DSL.new( debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0);
-lives-ok( { $otx.validate(q:to/HERE/) }, 'generator block2');
+lives-ok( { $otx.validate(q:to/HERE/) }, 'generator block back slash');
 HELLO WORLD
-generator: \
-$a = 1;      \
-$b = 2;      \
-[ 1, 2, 3]   
+generator:      \
+my $a = 1;      \
+my $b = 2;      \
+[ 1, 2, 3]      \
+
+regexp: \d OK
+hello world
+HERE
+
+$otx.validate(q:to/HERE/);
+HELLO WORLD
+generator:      \
+my $a = 1;      \
+my $b = 2;      \
+[ 1, 2, 3]      \
 
 regexp: \d OK
 hello world

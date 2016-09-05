@@ -80,35 +80,42 @@ class Outhentix::DSL {
 
   method !handle-code (Str $code is copy) { 
 
-  if $code ~~ s/^^\!(\w+)\s*$$// {
+    my $result;
+  
+    if $code ~~ s/^^\!(\w+)\s*$$// {
+  
+        my $language = $0;
+      
+        my ( $source-file, $filehandle ) = tempfile(:tempdir($!cache-dir),:!unlink);
+      
+        spurt $source-file, $code;
+      
+        my $ext-runner = $language eq 'bash' ?? "bash -c 'source " ~ $source-file ~ "'" 
+        !!  ( %!languages{$language} || $language ) ~ ' ' ~ $source-file;
+      
+        $ext-runner ~= ' ' ~ '1>' ~ $source-file ~ '.out';
+        $ext-runner ~= ' ' ~ '2>' ~ $source-file ~ '.err';
+      
+        self!debug("running shell: $ext-runner") if $!debug-mode >= 3;
+  
+        shell $ext-runner;
+  
+        self!debug("$language code OK. code: $code") if $!debug-mode >= 2;
+      
+        $result = slurp $source-file ~ '.out';
+      
+        
+      } else {
+  
+        self!debug("running inline perl6: $code") if $!debug-mode >= 2;
 
-      my $language = $0;
-    
-      my ( $source-file, $filehandle ) = tempfile(:tempdir($!cache-dir),:!unlink);
-    
-      spurt $source-file, $code;
-    
-      my $ext-runner = $language eq 'bash' ?? "bash -c 'source " ~ $source-file ~ "'" 
-      !!  ( %!languages{$language} || $language ) ~ ' ' ~ $source-file;
-    
-      $ext-runner ~= ' ' ~ '1>' ~ $source-file ~ '.out';
-      $ext-runner ~= ' ' ~ '2>' ~ $source-file ~ '.err';
-    
-      self!debug("running shell: $ext-runner") if $!debug-mode >= 3;
-
-      shell $ext-runner;
-
-      self!debug("$language code OK. code: $code") if $!debug-mode >= 2;
-    
-      slurp $source-file ~ '.out';
-    
-    } else {
-
-      EVAL $code;
-
-      self!debug("perl6 code OK. code: $code") if $!debug-mode >= 2;
-
-    }
+        $result = (EVAL $code).join("\n");
+  
+        self!debug("perl6 code OK. code: $code") if $!debug-mode >= 2;
+  
+      }
+  
+    return $result;
 
   } # end of method
 
@@ -116,7 +123,7 @@ class Outhentix::DSL {
 
   method !handle-validator ($code) { }
 
-  method !handle-generator ($code) { }
+  method !handle-generator ($code) { self.validate((self!handle-code($code))) }
 
   method !handle-regexp ($re) { }
 
@@ -225,7 +232,7 @@ class Outhentix::DSL {
 
             my $code = $1;
 
-            if $code ~~ s/\\\s*$// {
+            if $code ~~ s/.*\\\s*$// {
 
                  # this is multiline block, accumulate lines until meet '\' line
 
