@@ -121,7 +121,12 @@ class Outhentix::DSL {
 
 
 
-  method !handle-validator ($code) { }
+  method !handle-validator ($code) { 
+
+    my @result = self!handle-code($code).lines;
+    
+
+  }
 
   method !handle-generator ($code) { self.validate((self!handle-code($code))) }
 
