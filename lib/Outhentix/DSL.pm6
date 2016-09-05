@@ -4,6 +4,8 @@ use Outhentix::DSL::Context::Range;
 use Outhentix::DSL::Context::TextBlock;
 use Outhentix::DSL::Context::Default;
 use Outhentix::DSL::Error::UnterminatedBlock;
+use MONKEY-SEE-NO-EVAL;
+use File::Temp;
 
 class Outhentix::DSL {
 
@@ -23,6 +25,7 @@ class Outhentix::DSL {
   has %.languages;
   has %.stream;
   has Int $.debug-mode = 0;
+  has Str $.cache-dir = %*ENV<OTX_CACHE_DIR> ?? %*ENV<OTX_CACHE_DIR>.Str !! '/tmp';
 
   method !add-result (%item) {
     %item<type> = 'check_expression';
@@ -76,7 +79,36 @@ class Outhentix::DSL {
   
   }
 
-  method !handle-code ($code) { }
+  method !handle-code (Str $code) { 
+
+  if $code ~~ m/^^\!(\w+)\s*$$/ {
+
+      my $language = $0;
+    
+      my ( $source-file, $filehandle ) = tempfile(:tempdir($!cache-dir),:!unlink);
+    
+      spurt $source-file, $code;
+    
+      my $ext-runner = $language eq 'bash' ?? "bash -c 'source " ~ $source-file ~ "'" 
+      !!  %!languages{$language} ~ ' ' ~ $source-file;
+    
+      $ext-runner ~= ' ' ~ '1>' ~ $source-file ~ '.out';
+      $ext-runner ~= ' ' ~ '2>' ~ $source-file ~ '.err';
+    
+      self!debug("$ext-runner code OK. code: $code") if $!debug-mode >= 2;
+    
+      slurp $source-file ~ '.out';
+    
+    } else {
+
+      EVAL $code;
+
+      self!debug("perl6 code OK. code: $code") if $!debug-mode >= 2;
+
+    }
+
+  } # end of method
+
 
   method !handle-validator ($code) { }
 
@@ -103,6 +135,7 @@ class Outhentix::DSL {
         my $l = $ll.chomp;
 
         self!debug("[type] " ~ ($block-type || 'not set') ) if $!debug-mode >= 2;
+
         self!debug("[dsl] $l") if $!debug-mode >= 2;
 
         next LINE unless $l ~~ m/\S/;    # skip blank lines
@@ -136,7 +169,7 @@ class Outhentix::DSL {
 
                 self!debug("$block-type block end.") if $!debug-mode  >= 2;
 
-                self!"$name"(@multiline-block.join(''));
+                self!"$name"(@multiline-block.join("\n"));
 
                 # flush mulitline block data:
                 $block-type = Nil;
@@ -252,7 +285,7 @@ class Outhentix::DSL {
     }
   
   }
-  
+
 }
 
 
