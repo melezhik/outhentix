@@ -3,7 +3,6 @@ use v6;
 use Outhentix::DSL::Context::Range;
 use Outhentix::DSL::Context::TextBlock;
 use Outhentix::DSL::Context::Default;
-use Outhentix::DSL::Error::UnterminatedBlock;
 use MONKEY-SEE-NO-EVAL;
 use File::Temp;
 
@@ -81,6 +80,8 @@ class Outhentix::DSL {
 
   method !handle-code (Str $code) { 
 
+  return unless @!current-context; # do nothing when empty content
+
   if $code ~~ m/^^\!(\w+)\s*$$/ {
 
       my $language = $0;
@@ -95,7 +96,11 @@ class Outhentix::DSL {
       $ext-runner ~= ' ' ~ '1>' ~ $source-file ~ '.out';
       $ext-runner ~= ' ' ~ '2>' ~ $source-file ~ '.err';
     
-      self!debug("$ext-runner code OK. code: $code") if $!debug-mode >= 2;
+      self!debug("running shell: $ext-runner") if $!debug-mode >= 3;
+
+      shell $ext-runner;
+
+      self!debug("$language code OK. code: $code") if $!debug-mode >= 2;
     
       slurp $source-file ~ '.out';
     
@@ -160,21 +165,8 @@ class Outhentix::DSL {
                @multiline-block.push: $l;
 
              } else {
-
                 # the end of multiline block or here string
-
-                my $name = "handle-"; 
-                $name ~= $block-type;
-                @multiline-block.push: $l;
-
-                self!debug("$block-type block end.") if $!debug-mode  >= 2;
-
-                self!"$name"(@multiline-block.join("\n"));
-
-                # flush mulitline block data:
-                $block-type = Nil;
-                @multiline-block = Array.new;
-
+                self!flush-multiline-block( $block-type, @multiline-block, $l);
             }
       
         } elsif $l ~~ m/^\s*begin:\s*$/ { # begining  of the text block
@@ -277,15 +269,26 @@ class Outhentix::DSL {
 
         }
     }
-
-    if $block-type.defined {
-      Outhentix::DSL::Error::UnterminatedBlock.new( message => 
-        "Unterminated multiline block found. Last line: " ~ ( @multiline-block.pop )
-      ).throw;
-    }
+      self!flush-multiline-block( $block-type, @multiline-block, Nil) if $block-type;
   
   }
 
+  method  !flush-multiline-block ($block-type is rw, @multiline-block , $line) {
+
+    my $name = "handle-" ~ $block-type; 
+
+    @multiline-block.push: $line if $line;
+  
+    self!debug("$block-type block end.") if $!debug-mode  >= 2;
+  
+    self!"$name"(@multiline-block.join("\n"));
+  
+    # flush mulitline block data:
+    $block-type = Nil;
+    @multiline-block = Array.new;
+
+
+  }
 }
 
 

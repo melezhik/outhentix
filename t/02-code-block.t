@@ -6,7 +6,10 @@ plan 3;
 
 ok 1, 'Module loaded';
 
-my $otx = Outhentix::DSL.new( debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0);
+my $otx = Outhentix::DSL.new( 
+  debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0
+);
+
 lives-ok( { $otx.validate(q:to/HERE/) }, 'code block');
 HELLO WORLD
 code: <<FOO
@@ -19,7 +22,10 @@ regexp: \d OK
 hello world
 HERE
 
-$otx = Outhentix::DSL.new( debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0);
+$otx = Outhentix::DSL.new( 
+  debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
+);
+
 lives-ok( { $otx.validate(q:to/HERE/) }, 'code block2');
 HELLO WORLD
 code: \
