@@ -78,11 +78,9 @@ class Outhentix::DSL {
   
   }
 
-  method !handle-code (Str $code) { 
+  method !handle-code (Str $code is copy) { 
 
-  return unless @!current-context; # do nothing when empty content
-
-  if $code ~~ m/^^\!(\w+)\s*$$/ {
+  if $code ~~ s/^^\!(\w+)\s*$$// {
 
       my $language = $0;
     
@@ -91,7 +89,7 @@ class Outhentix::DSL {
       spurt $source-file, $code;
     
       my $ext-runner = $language eq 'bash' ?? "bash -c 'source " ~ $source-file ~ "'" 
-      !!  %!languages{$language} ~ ' ' ~ $source-file;
+      !!  ( %!languages{$language} || $language ) ~ ' ' ~ $source-file;
     
       $ext-runner ~= ' ' ~ '1>' ~ $source-file ~ '.out';
       $ext-runner ~= ' ' ~ '2>' ~ $source-file ~ '.err';
@@ -113,6 +111,7 @@ class Outhentix::DSL {
     }
 
   } # end of method
+
 
 
   method !handle-validator ($code) { }
@@ -153,24 +152,21 @@ class Outhentix::DSL {
 
           self!debug("here string mode off") if $!debug-mode >= 2;
 
-        } elsif $block-type { # multiline block
+        } elsif $block-type && ( $l ~~ s/\\\s*$// or $here-str-mode ) { # multiline block
 
-             if ( $l ~~ s/\\\s*$// or $here-str-mode ) {
+           # this is multiline block or here string, 
+           # accumulate lines until meet line not ending with '\' ( for multiline blocks )
+           # or here string end marker ( for here stings )
+  
+           self!debug("\tpush $l to $block-type ...") if $!debug-mode  >= 2;
 
-               # this is multiline block or here string, 
-               # accumulate lines until meet line not ending with '\' ( for multiline blocks )
-               # or here string end marker ( for here stings )
-
-               self!debug("\tpush $l to $block-type ...") if $!debug-mode  >= 2;
-               @multiline-block.push: $l;
-
-             } else {
-                # the end of multiline block or here string
-                self!flush-multiline-block( $block-type, @multiline-block, $l);
-            }
+           @multiline-block.push: $l;
+  
       
         } elsif $l ~~ m/^\s*begin:\s*$/ { # begining  of the text block
 
+            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
+ 
             die "you can't switch to text block mode when within mode is enabled" if $!within-mode;
 
             $!context-modificator = Outthentic::DSL::Context::TextBlock.new();
@@ -183,19 +179,23 @@ class Outhentix::DSL {
 
         } elsif ($l ~~ m/^\s*end:\s*$/) { # end of the text block
 
+            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
+
             $!block-mode = False;
 
             self!reset-context();
 
             self!debug('text block end') if $!debug-mode >= 2;
 
-        }
+        } elsif $l ~~ m/^\s*reset_context:\s*$/ {
 
-        if $l ~~ m/^\s*reset_context:\s*$/ {
+            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
             self!reset-context();
 
         } elsif ($l ~~ m/^\s*assert:\s(\S+)\s+(.*)$/) {
+
+            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
             my $status = $0; my $message = $1;
 
@@ -209,12 +209,17 @@ class Outhentix::DSL {
 
         } elsif ($l ~~ m/^\s*between:\s+(.*)/) { # range context
             
+            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
+
             $!context-modificator = Outthentic::DSL::Context::Range.new($0);
 
             die "you can't switch to range context mode when within mode is enabled" if $!within-mode;
 
             die "you can't switch to range context mode when block mode is enabled" if $!block-mode;
+
         } elsif $l ~~ m/^\s*(code|generator|validator):\s*(.*)/  {
+
+            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
             $block-type = $0;
 
@@ -239,6 +244,8 @@ class Outhentix::DSL {
 
             } else {
 
+                self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
+
                 $block-type = Nil;
 
                 self!"handle-$block-type"($code);
@@ -247,11 +254,15 @@ class Outhentix::DSL {
 
         } elsif $l ~~ /^\s*regexp:\s*(.*)/ { # `regexp' line
 
+            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
+
             my $re = $0;
 
             self!handle-regexp($re);
 
         } elsif $l ~~ /^\s*within:\s*(.*)/ {
+
+            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
             die "you can't switch to within mode when text block mode is enabled" if $!block-mode;
 
@@ -261,6 +272,8 @@ class Outhentix::DSL {
 
         } else { # `plain string' line
 
+            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
+
             $l ~~ s/\s+\#.*//; 
 
             $l ~~ s/^\s+//;
@@ -269,18 +282,17 @@ class Outhentix::DSL {
 
         }
     }
-      self!flush-multiline-block( $block-type, @multiline-block, Nil) if $block-type;
+
+      self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
   
   }
 
-  method  !flush-multiline-block ($block-type is rw, @multiline-block , $line) {
+  method  !flush-multiline-block ($block-type is rw, @multiline-block) {
 
     my $name = "handle-" ~ $block-type; 
 
-    @multiline-block.push: $line if $line;
-  
     self!debug("$block-type block end.") if $!debug-mode  >= 2;
-  
+
     self!"$name"(@multiline-block.join("\n"));
   
     # flush mulitline block data:
