@@ -135,8 +135,52 @@ class Outhentix::DSL {
 
   method !handle-within ($re) { }
 
-  method !handle-plain ($str) { }
+  method !handle-plain (Str $l) {
+  
+    my $msg;
 
+    my $lshort =  self!short-string($l);
+  
+    my $reset-context = False;
+  
+    if $!within-mode {
+  
+        $!within-mode = False;
+
+        $reset-context = True;
+        
+        $msg = $!last-check-status ?? "'" ~ self!short-string($!last-match-line) 
+        ~ "'" ~ ' match ' ~ "'" ~ $lshort ~ "'" !! "output match '" ~ $lshort ~ "'";
+
+
+    } else {
+        $msg = $!block-mode ?? "[b] output match '$lshort'" !! "output match '$lshort'";
+    }
+  
+  
+    self!check-line($l, 'default', $msg);
+  
+    self!reset-context if $reset-context;
+  
+    self!debug("plain OK. $l") if $!debug-mode >= 3;
+
+  }
+
+  method !short-string (Str $l) {
+  
+      my $orig-l = $l;
+
+      my $short-l = substr( $l, 0, $!match-l );
+
+      $short-l ~~ s/\r//; $orig-l ~~ s/\r//;
+  
+      return $short-l le $orig-l ?? "$short-l ..." !! $orig-l;
+  
+  }
+
+  method !check-line ( Str $l, Str $check-type, Str $message ) {
+  }
+    
   method validate ($check-list) {
 
     my @lines;
