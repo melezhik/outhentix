@@ -176,7 +176,7 @@ class Outhentix::DSL {
            @multiline-block.push: $l;
   
       
-        } elsif $l ~~ m/^\s*begin:\s*$/ { # begining  of the text block
+        } elsif $l ~~ m/^\s*begin\:\s*$/ { # begining  of the text block
 
             self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
  
@@ -200,27 +200,27 @@ class Outhentix::DSL {
 
             self!debug('text block end') if $!debug-mode >= 2;
 
-        } elsif $l ~~ m/^\s*reset_context:\s*$/ {
+        } elsif $l ~~ m/^\s*reset_context\:\s*$/ {
 
             self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
             self!reset-context();
 
-        } elsif ($l ~~ m/^\s*assert:\s(\S+)\s+(.*)$/) {
-
-            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
+        } elsif $l ~~ m/^\s*assert\:\s+(\d+)\s+(.*)/ {
 
             my $status = $0; my $message = $1;
 
-            self!debug("assert found: $status , $message") if $!debug-mode >= 2;
+            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
+
+            self!debug("assert found: $status | $message") if $!debug-mode >= 2;
 
             $status = False if $status eq 'false'; # ruby to perl6 conversion
 
             $status = True if $status eq 'true'; # ruby to perl6 conversion
 
-            self!add-result %( status => $status , message => $message );
+            self!add-result({ status => $status , message => $message });
 
-        } elsif ($l ~~ m/^\s*between:\s+(.*)/) { # range context
+        } elsif $l ~~ m/^\s*between:\s+(.*)/ { # range context
             
             self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
@@ -230,7 +230,7 @@ class Outhentix::DSL {
 
             die "you can't switch to range context mode when block mode is enabled" if $!block-mode;
 
-        } elsif $l ~~ m/^\s*(code|generator|validator):\s*(.*)/  {
+        } elsif $l ~~ m/^\s*(code|generator|validator)\:\s*(.*)/  {
 
             self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
@@ -265,7 +265,7 @@ class Outhentix::DSL {
 
             }
 
-        } elsif $l ~~ /^\s*regexp:\s*(.*)/ { # `regexp' line
+        } elsif $l ~~ /^\s*regexp\:\s*(.*)/ { # `regexp' line
 
             self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
@@ -273,7 +273,7 @@ class Outhentix::DSL {
 
             self!handle-regexp($re);
 
-        } elsif $l ~~ /^\s*within:\s*(.*)/ {
+        } elsif $l ~~ /^\s*within\:\s*(.*)/ {
 
             self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
