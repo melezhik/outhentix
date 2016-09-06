@@ -27,7 +27,7 @@ class Outhentix::DSL {
   has Int $.debug-mode = 0;
   has Str $.cache-dir = %*ENV<OTX_CACHE_DIR> ?? %*ENV<OTX_CACHE_DIR>.Str !! '/tmp';
 
-  method !add-result (%item) {
+  method !add-result ( %item ) {
     %item<type> = 'check-expression';
     @!results.push: %item;
   }
@@ -125,7 +125,7 @@ class Outhentix::DSL {
   method !handle-validator ($code) { 
 
     my @result = self!handle-code($code).lines;
-    self!add-result %( status => @result[0], message => @result[1] );    
+    self!add-result({ status => @result[0], message => @result[1] });    
 
   }
 
@@ -218,7 +218,7 @@ class Outhentix::DSL {
 
             $status = True if $status eq 'true'; # ruby to perl6 conversion
 
-            self!add-result({ status => $status , message => $message });
+            self!add-result %( status => $status , message => $message );
 
         } elsif ($l ~~ m/^\s*between:\s+(.*)/) { # range context
             
