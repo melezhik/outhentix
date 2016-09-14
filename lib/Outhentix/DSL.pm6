@@ -178,7 +178,135 @@ class Outhentix::DSL {
   
   }
 
-  method !check-line ( Str $l, Str $check-type, Str $message ) {
+  method reset-captures {
+    # TODO: not implimented yet
+  }
+
+  method !check-line ( Str $pattern, Str $check-type, Str $message ) {
+
+
+    my $status = False;
+
+    self!reset-captures();
+
+    my @captures = Array.new;
+
+    self!create-context;
+
+    self!debug("[lookup] $pattern ...") if $!debug-mode >= 2;
+
+    my @original-context   = @!original-context;
+
+    my @context-new  = Array.new;
+
+    # dynamic context
+    my @dc = $!context-modificator.change-context($!current-context,$!original-context, $!succeeded);
+
+    $!succeeded = Array.new;
+
+    $self!debug("context modificator applied: " ~ ($context-modificator.WHAT)) if $!debug-mode >=2;
+
+    if $!debug-mode >= 2 {
+      for @dc -> $i { self!debug("[dc] " ~ $i->[0]) } 
+    }
+
+
+    if $check-type eq 'default' {
+
+        for @dc -> $c {
+
+            my $ln = $c->[0];
+
+            next if $ln ~~ m/#dsl_note:/;
+
+            if ( index($ln,$pattern) != -1 ){
+                $status = True;
+                $!last-match-line = $ln;
+                @!succeeded.push: $c;
+            }
+        }
+
+    } elsif $check-type eq 'regexp' {
+
+
+        for @dc -> $c {
+
+            my $re = qr/$pattern/;
+
+            my $ln = $c->[0];
+
+            next if $ln eq ":blank_line";
+            next if $ln =~/#dsl_note:/;
+
+            my @foo = ($ln =~ /$re/g);
+
+            if (scalar @foo){
+                push @captures, [@foo];
+                $status = 1;
+                push @{$self->{succeeded}}, $c;
+                push @context_new, $c if $self->{within_mode};
+                $self->{last_match_line} = $ln;
+            }
+
+        }
+    }else {
+        confess "unknown check_type: $check_type";
+    }
+
+
+
+    $self->{last_check_status} = $status;
+
+    if ( $self->{debug_mod} >= 2 ){
+
+        my $i = -1;
+        my $j = -1;
+        for my $cpp (@captures){
+            $i++;
+            for my $cp (@{$cpp}){
+                $j++;
+                $self->add_debug_result("CAP[$i,$j]: $cp");
+            }
+            $j=0;
+        }
+
+        for my $s (@{$self->{succeeded}}){
+            $self->add_debug_result("SUCC: $s->[0]");
+        }
+    }
+
+    $self->{captures} = [ @captures ];
+
+    if ($self->{cache_dir}){
+      open CAPTURES, '>', $self->{cache_dir}.'/captures.json'
+        or confess "can't open ".($self->{cache_dir})."captures.json to write $!";
+      print CAPTURES encode_json($self->{captures});
+      $self->add_debug_result("CAPTURES saved at ".$self->{cache_dir}.'/captures.json')
+        if $self->{debug_mod} >= 1;
+      close CAPTURES;
+    }
+
+    # update context
+    if ( $self->{within_mode} and $status ){
+        $self->{current_context} = [@context_new];
+        $self->add_debug_result('within mode: modify search context to: '.(Dumper([@context_new]))) if $self->{debug_mod} >= 2
+    }elsif ( $self->{within_mode} and ! $status ){
+        $self->{current_context} = []; # empty context if within expression has not passed
+        $self->add_debug_result('within mode: modify search context to: '.(Dumper([@context_new]))) if $self->{debug_mod} >= 2
+    }
+
+    $self->add_result({ status => $status , message => $message });
+
+
+    $self->{context_modificator}->update_stream(
+        $self->{current_context},
+        $self->{original_context},
+        $self->{succeeded},
+        \($self->{stream}),
+    );
+
+    return $status;
+
   }
     
   method validate ($check-list) {
