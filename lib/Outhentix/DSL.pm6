@@ -179,7 +179,9 @@ class Outhentix::DSL {
   }
 
   method reset-captures {
-    # TODO: not implimented yet
+    @!captures = Array.new;
+    ($!cache-dir ~ ."/captures.json").IO.unlink if ($!cache-dir ~ ."/captures.json").IO ~~ :e;
+
   }
 
   method !check-line ( Str $pattern, Str $check-type, Str $message ) {
@@ -231,41 +233,40 @@ class Outhentix::DSL {
 
         for @dc -> $c {
 
-            my $re = qr/$pattern/;
-
             my $ln = $c->[0];
 
             next if $ln eq ":blank_line";
-            next if $ln =~/#dsl_note:/;
+            next if $ln ~~ m/#dsl_note:/;
 
-            my @foo = ($ln =~ /$re/g);
+            $ln ~~ m:g/<$pattern>/;
 
-            if (scalar @foo){
-                push @captures, [@foo];
-                $status = 1;
-                push @{$self->{succeeded}}, $c;
+            if @foo {
+                @captures.push: [ @foo ];
+                $status = True;
+                @!succeeded.push: $c;
                 push @context_new, $c if $self->{within_mode};
                 $self->{last_match_line} = $ln;
             }
 
         }
     }else {
-        confess "unknown check_type: $check_type";
+        die "unknown check type: $check-type";
     }
 
 
 
-    $self->{last_check_status} = $status;
+    $!last-check-status = $status;
 
-    if ( $self->{debug_mod} >= 2 ){
+    if $!debug-mode >= 2 {
 
         my $i = -1;
         my $j = -1;
-        for my $cpp (@captures){
+
+        for @captures -> $cpp {
             $i++;
             for my $cp (@{$cpp}){
                 $j++;
-                $self->add_debug_result("CAP[$i,$j]: $cp");
+                self!debug("CAP[$i,$j]: $cp");
             }
             $j=0;
         }
