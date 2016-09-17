@@ -3,6 +3,7 @@ use v6;
 use Outhentix::DSL::Context::Range;
 use Outhentix::DSL::Context::TextBlock;
 use Outhentix::DSL::Context::Default;
+use JSON::Tiny;
 
 use MONKEY-SEE-NO-EVAL;
 use File::Temp;
@@ -206,7 +207,7 @@ class Outhentix::DSL {
 
     $!succeeded = Array.new;
 
-    $self!debug("context modificator applied: " ~ ($context-modificator.WHAT)) if $!debug-mode >=2;
+    self!debug("context modificator applied: " ~ ($context-modificator.WHAT)) if $!debug-mode >=2;
 
     if $!debug-mode >= 2 {
       for @dc -> $i { self!debug("[dc] " ~ $i->[0]) } 
@@ -238,14 +239,14 @@ class Outhentix::DSL {
             next if $ln eq ":blank_line";
             next if $ln ~~ m/#dsl_note:/;
 
-            $ln ~~ m:g/<$pattern>/;
+            my $matched = $ln.comb(/mymatch=<$pattern>/,:match)>>.mymatch;
 
-            if @foo {
-                @captures.push: [ @foo ];
+            if $matched {
+                @captures.push: [ $matched>>.Slip>>.Str ] if $matched>>.Slip>>.Str;
                 $status = True;
                 @!succeeded.push: $c;
-                push @context_new, $c if $self->{within_mode};
-                $self->{last_match_line} = $ln;
+                @context-new.push: $c if $!within-mode;
+                $!last-match-line = $ln;
             }
 
         }
@@ -271,40 +272,29 @@ class Outhentix::DSL {
             $j=0;
         }
 
-        for my $s (@{$self->{succeeded}}){
-            $self->add_debug_result("SUCC: $s->[0]");
+        for @!succeeded -> $s {
+            self!debug("SUCC: $s[0]");
         }
     }
 
-    $self->{captures} = [ @captures ];
+    @!captures = @captures;
 
-    if ($self->{cache_dir}){
-      open CAPTURES, '>', $self->{cache_dir}.'/captures.json'
-        or confess "can't open ".($self->{cache_dir})."captures.json to write $!";
-      print CAPTURES encode_json($self->{captures});
-      $self->add_debug_result("CAPTURES saved at ".$self->{cache_dir}.'/captures.json')
-        if $self->{debug_mod} >= 1;
-      close CAPTURES;
-    }
+    spurt ($!cache-dir ~ '/captures.json' ), to-json(@!captures);
+    self!debug("CAPTURES saved at " ~ $!cache-dir ~ '/captures.json' ) if $!debug-mode >= 1;
 
     # update context
-    if ( $self->{within_mode} and $status ){
-        $self->{current_context} = [@context_new];
-        $self->add_debug_result('within mode: modify search context to: '.(Dumper([@context_new]))) if $self->{debug_mod} >= 2
-    }elsif ( $self->{within_mode} and ! $status ){
-        $self->{current_context} = []; # empty context if within expression has not passed
-        $self->add_debug_result('within mode: modify search context to: '.(Dumper([@context_new]))) if $self->{debug_mod} >= 2
+    if  $!within-mode and $status {
+        @!current-context = @context-new;
+        self!debug('within mode: modify search context to: ' ~ (@context-new.perl)) if $!debug-mode >= 2
+    }elsif ( $!within-mode and ! $status ){
+        @!current-context = Array.new; # empty context if within expression has not matched
+        self!debug('within mode: modify search context to: ' ~ (@context-new.perl)) if $!debug-mode >= 2
     }
 
-    $self->add_result({ status => $status , message => $message });
+    self!add-result({ status => $status , message => $message });
 
 
-    $self->{context_modificator}->update_stream(
-        $self->{current_context},
-        $self->{original_context},
-        $self->{succeeded},
-        \($self->{stream}),
-    );
+    self!context-modificator.update_stream(@!current-context, @!original-context, @!succeeded, $!stream);
 
     return $status;
 

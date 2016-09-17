@@ -4,7 +4,8 @@
   "description" : "Text validator DSL",
   "authors" : [ "Alexey Melezhik"],
   "depends" : [
-                "File::Temp"
+                "File::Temp",
+                "JSON::Tiny"
               ],
   "source-type" : "git",
   "support" : {
