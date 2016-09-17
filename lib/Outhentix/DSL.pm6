@@ -43,7 +43,7 @@ class Outhentix::DSL {
   
       self!debug('reset search context') if $!debug-mode >= 2;
   
-      $.context-modificator = Outthentic::DSL::Context::Default.new();
+      $!context-modificator = Outthentic::DSL::Context::Default.new();
   
   }
 
@@ -190,7 +190,7 @@ class Outhentix::DSL {
 
     my $status = False;
 
-    self!reset-captures();
+    self!reset-captures;
 
     my @captures = Array.new;
 
@@ -198,16 +198,14 @@ class Outhentix::DSL {
 
     self!debug("[lookup] $pattern ...") if $!debug-mode >= 2;
 
-    my @original-context   = @!original-context;
-
-    my @context-new  = Array.new;
+    my @context-new = Array.new;
 
     # dynamic context
-    my @dc = $!context-modificator.change-context($!current-context,$!original-context, $!succeeded);
+    my @dc = $!context-modificator.change-context(@!current-context,@!original-context, @!succeeded);
 
     $!succeeded = Array.new;
 
-    self!debug("context modificator applied: " ~ ($context-modificator.WHAT)) if $!debug-mode >=2;
+    self!debug("context modificator applied: " ~ ($!context-modificator.WHAT)) if $!debug-mode >=2;
 
     if $!debug-mode >= 2 {
       for @dc -> $i { self!debug("[dc] " ~ $i->[0]) } 
@@ -294,7 +292,7 @@ class Outhentix::DSL {
     self!add-result({ status => $status , message => $message });
 
 
-    self!context-modificator.update_stream(@!current-context, @!original-context, @!succeeded, $!stream);
+    self!context-modificator.update-stream(@!current-context, @!original-context, @!succeeded, %!stream);
 
     return $status;
 
