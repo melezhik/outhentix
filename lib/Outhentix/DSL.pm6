@@ -179,9 +179,9 @@ class Outhentix::DSL {
   
   }
 
-  method reset-captures {
+  method !reset-captures {
     @!captures = Array.new;
-    ($!cache-dir ~ ."/captures.json").IO.unlink if ($!cache-dir ~ ."/captures.json").IO ~~ :e;
+    ($!cache-dir ~ "/captures.json").IO.unlink if ($!cache-dir ~ "/captures.json").IO ~~ :e;
 
   }
 
@@ -203,12 +203,12 @@ class Outhentix::DSL {
     # dynamic context
     my @dc = $!context-modificator.change-context(@!current-context,@!original-context, @!succeeded);
 
-    $!succeeded = Array.new;
+    @!succeeded = Array.new;
 
     self!debug("context modificator applied: " ~ ($!context-modificator.WHAT)) if $!debug-mode >=2;
 
     if $!debug-mode >= 2 {
-      for @dc -> $i { self!debug("[dc] " ~ $i->[0]) } 
+      for @dc -> $i { self!debug("[dc] " ~ $i[0]) } 
     }
 
 
@@ -216,11 +216,11 @@ class Outhentix::DSL {
 
         for @dc -> $c {
 
-            my $ln = $c->[0];
+            my $ln = $c[0];
 
-            next if $ln ~~ m/#dsl_note:/;
+            next if $ln ~~ m/\#dsl_note:/;
 
-            if ( index($ln,$pattern) != -1 ){
+            if index($ln,$pattern) == 0  {
                 $status = True;
                 $!last-match-line = $ln;
                 @!succeeded.push: $c;
@@ -232,12 +232,12 @@ class Outhentix::DSL {
 
         for @dc -> $c {
 
-            my $ln = $c->[0];
+            my $ln = $c[0];
 
             next if $ln eq ":blank_line";
-            next if $ln ~~ m/#dsl_note:/;
+            next if $ln ~~ m/\#dsl_note:/;
 
-            my $matched = $ln.comb(/mymatch=<$pattern>/,:match)>>.mymatch;
+            my $matched = $ln.comb(/<mymatch=$pattern>/,:match)>>.<mymatch>;
 
             if $matched {
                 @captures.push: [ $matched>>.Slip>>.Str ] if $matched>>.Slip>>.Str;
@@ -263,7 +263,7 @@ class Outhentix::DSL {
 
         for @captures -> $cpp {
             $i++;
-            for my $cp (@{$cpp}){
+            for @($cpp) -> $cp {
                 $j++;
                 self!debug("CAP[$i,$j]: $cp");
             }
@@ -283,16 +283,15 @@ class Outhentix::DSL {
     # update context
     if  $!within-mode and $status {
         @!current-context = @context-new;
-        self!debug('within mode: modify search context to: ' ~ (@context-new.perl)) if $!debug-mode >= 2
-    }elsif ( $!within-mode and ! $status ){
+        self!debug('within mode: modify search context to: ' ~ (@context-new.perl)) if $!debug-mode >= 2;
+    } elsif $!within-mode and ! $status {
         @!current-context = Array.new; # empty context if within expression has not matched
-        self!debug('within mode: modify search context to: ' ~ (@context-new.perl)) if $!debug-mode >= 2
+        self!debug('within mode: modify search context to: ' ~ (@context-new.perl)) if $!debug-mode >= 2;
     }
 
     self!add-result({ status => $status , message => $message });
 
-
-    self!context-modificator.update-stream(@!current-context, @!original-context, @!succeeded, %!stream);
+    $!context-modificator.update-stream(@!current-context, @!original-context, @!succeeded, %!stream);
 
     return $status;
 
