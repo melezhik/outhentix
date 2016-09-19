@@ -220,7 +220,7 @@ class Outhentix::DSL {
 
             next if $ln ~~ m/\#dsl_note:/;
 
-            if index($ln,$pattern) == 0  {
+            if index($ln,$pattern) >= 0  {
                 $status = True;
                 $!last-match-line = $ln;
                 @!succeeded.push: $c;
@@ -278,6 +278,7 @@ class Outhentix::DSL {
     @!captures = @captures;
 
     spurt ($!cache-dir ~ '/captures.json' ), to-json(@!captures);
+
     self!debug("CAPTURES saved at " ~ $!cache-dir ~ '/captures.json' ) if $!debug-mode >= 1;
 
     # update context
