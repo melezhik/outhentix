@@ -50,13 +50,12 @@ class Outhentix::DSL {
   method !create-context {
   
       return if $!has-context;
-      return [] unless $!output;
 
       my $i = 0;
   
       my @context = Array.new;
   
-      for $!output.lines -> $ll {
+      for ($!output ?? $!output.lines !! [] ) -> $ll {
 
           my $l = $ll.chomp;
 
@@ -159,12 +158,12 @@ class Outhentix::DSL {
         $msg = $!block-mode ?? "[b] output match '$lshort'" !! "output match '$lshort'";
     }
   
-  
+
     self!check-line($l, 'default', $msg);
   
     self!reset-context if $reset-context;
   
-    self!debug("plain OK. $l") if $!debug-mode >= 3;
+    self!debug("plain OK. >>> <<<$l>>>") if $!debug-mode >= 3;
 
   }
 
