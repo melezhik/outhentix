@@ -132,11 +132,17 @@ class Outhentix::DSL {
 
   method !handle-generator ($code) { self.validate((self!handle-code($code))) }
 
-  method !handle-regexp ($re) { }
-
   method !handle-within ($re) { }
 
-  method !handle-plain (Str $l) {
+  method !handle-plain (Str $line) {
+    self!handle-simple($line, 'default');
+  }
+
+  method !handle-regexp (Str $line) {
+    self!handle-simple($line, 'regexp');
+  }
+
+  method !handle-simple (Str $l, Str $check-type) {
   
     my $msg;
 
@@ -159,11 +165,11 @@ class Outhentix::DSL {
     }
   
 
-    self!check-line($l, 'default', $msg);
+    self!check-line($l, $check-type, $msg);
   
     self!reset-context if $reset-context;
   
-    self!debug("plain OK. >>> <<<$l>>>") if $!debug-mode >= 3;
+    self!debug("$check-type check DONE. >>> <<<$l>>>") if $!debug-mode >= 3;
 
   }
 
@@ -431,7 +437,7 @@ class Outhentix::DSL {
 
             my $re = $0;
 
-            self!handle-regexp($re);
+            self!handle-regexp($re.Str);
 
         } elsif $l ~~ /^\s*within\:\s*(.*)/ {
 
