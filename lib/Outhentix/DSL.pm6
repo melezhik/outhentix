@@ -50,7 +50,8 @@ class Outhentix::DSL {
   method !create-context {
   
       return if $!has-context;
-  
+      return [] unless $!output;
+
       my $i = 0;
   
       my @context = Array.new;
@@ -205,7 +206,7 @@ class Outhentix::DSL {
 
     @!succeeded = Array.new;
 
-    self!debug("context modificator applied: " ~ ($!context-modificator.WHAT)) if $!debug-mode >=2;
+    self!debug("context modificator applied: " ~ ($!context-modificator.WHAT.perl)) if $!debug-mode >=2;
 
     if $!debug-mode >= 2 {
       for @dc -> $i { self!debug("[dc] " ~ $i[0]) } 
@@ -299,7 +300,6 @@ class Outhentix::DSL {
     
   method validate ($check-list) {
 
-    my @lines;
     my $block-type;
     my @multiline-block = Array.new;
     my $here-str-mode = False;
