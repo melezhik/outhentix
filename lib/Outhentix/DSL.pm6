@@ -225,8 +225,10 @@ class Outhentix::DSL {
             my $ln = $c[0];
 
             next if $ln ~~ m/\#dsl_note:/;
-            next unless index($ln,$pattern);
-            if index($ln,$pattern) >= 0  {
+            my $st = index($ln,$pattern);
+            next unless $st.defined;
+
+            if $st >= 0  {
                 $status = True;
                 $!last-match-line = $ln;
                 @!succeeded.push: $c;
