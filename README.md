@@ -17,6 +17,14 @@ to understand what Outhentix is.
     $ OTX_DEBUG=2 prove -e 'perl6 -I lib' -v -r t/
     $ panda --force install .
 
+# Environment variables
+
+I'll document these variables later. Here is just a list:
+
+* OTX_DEBUG (1,2,3,4)
+* OTX_STREAM_DEBUG (set|not set)
+
+
 # Author
 
 [Alexey Melezhik](mailto:melezhik@gmail.com)

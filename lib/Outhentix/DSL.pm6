@@ -321,7 +321,13 @@ class Outhentix::DSL {
 
     self!add-result({ status => $status , message => $message });
 
-    $!context-modificator.update-stream(@!current-context, @!original-context, @!succeeded, %!stream);
+    $!context-modificator.update-stream(
+      @!current-context, 
+      @!original-context, 
+      @!succeeded, 
+      %!stream,
+      %*ENV<OTX_STREAM_DEBUG> ?? True !! False
+    );
 
     return $status;
 
