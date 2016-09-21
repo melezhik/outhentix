@@ -28,6 +28,10 @@ class Outhentix::DSL {
   has Int $.debug-mode = 0;
   has Str $.cache-dir = %*ENV<OTX_CACHE_DIR> ?? %*ENV<OTX_CACHE_DIR>.Str !! '/tmp';
 
+  method captures {
+    @!captures;
+  }
+
   method !add-result ( %item ) {
     %item<type> = 'check-expression';
     @!results.push: %item;
@@ -225,10 +229,10 @@ class Outhentix::DSL {
             my $ln = $c[0];
 
             next if $ln ~~ m/\#dsl_note:/;
-            my $st = index($ln,$pattern);
-            next unless $st.defined;
 
-            if $st >= 0  {
+            my $st = index($ln,$pattern);
+
+            if $st.defined {
                 $status = True;
                 $!last-match-line = $ln;
                 @!succeeded.push: $c;
