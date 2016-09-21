@@ -47,7 +47,7 @@ class Outhentix::DSL {
   
       self!debug('reset search context') if $!debug-mode >= 2;
   
-      $!context-modificator = Outthentic::DSL::Context::Default.new();
+      $!context-modificator = Outhentix::DSL::Context::Default.new();
   
   }
 
@@ -136,7 +136,24 @@ class Outhentix::DSL {
 
   method !handle-generator ($code) { self.validate((self!handle-code($code))) }
 
-  method !handle-within ($re) { }
+  method !handle-within (Str $line) { 
+
+    my $msg;
+
+    if $!within-mode {
+      $msg = $!last-check-status ?? "'" ~ self!short-string($!last-match-line) ~ "' match /$line/"
+      !! "output match /$line/";
+    }else{
+        $msg = "output match /$line/";
+    }
+
+    $!within-mode = True;
+
+    self!check-line($line, 'regexp', $msg);
+
+    self!debug("within check DONE. >>> <<<$line>>>") if $!debug-mode >= 3;
+  
+  }
 
   method !handle-plain (Str $line) {
     self!handle-simple($line, 'default');
@@ -172,7 +189,7 @@ class Outhentix::DSL {
     self!check-line($l, $check-type, $msg);
   
     self!reset-context if $reset-context;
-  
+
     self!debug("$check-type check DONE. >>> <<<$l>>>") if $!debug-mode >= 3;
 
   }
@@ -354,7 +371,7 @@ class Outhentix::DSL {
  
             die "you can't switch to text block mode when within mode is enabled" if $!within-mode;
 
-            $!context-modificator = Outthentic::DSL::Context::TextBlock.new();
+            $!context-modificator = Outhentix::DSL::Context::TextBlock.new();
 
             self!debug('begin block start') if $!debug-mode >= 2;
 
@@ -396,7 +413,7 @@ class Outhentix::DSL {
             
             self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
-            $!context-modificator = Outthentic::DSL::Context::Range.new($0);
+            $!context-modificator = Outhentix::DSL::Context::Range.new($0);
 
             die "you can't switch to range context mode when within mode is enabled" if $!within-mode;
 
@@ -453,7 +470,7 @@ class Outhentix::DSL {
 
             my $re = $0;
 
-            self!handle-within($re);
+            self!handle-within($re.Str);
 
         } else { # `plain string' line
 
