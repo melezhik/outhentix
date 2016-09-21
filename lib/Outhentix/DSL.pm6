@@ -373,15 +373,15 @@ class Outhentix::DSL {
 
             $!context-modificator = Outhentix::DSL::Context::TextBlock.new();
 
-            self!debug('begin block start') if $!debug-mode >= 2;
+            self!debug('text block start') if $!debug-mode >= 2;
 
             $!block-mode = True;
 
             @!succeeded = Array.new;
 
-        } elsif ($l ~~ m/^\s*end:\s*$/) { # end of the text block
+        } elsif ($l ~~ m/^\s*end\:\s*$/) { # end of the text block
 
-            self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
+            #self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
             $!block-mode = False;
 
