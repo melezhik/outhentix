@@ -6,7 +6,7 @@ ok 1, 'Module loaded';
 
 my $otx = Outhentix::DSL.new( 
   debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
-  output => q:to/OUT/
+  output => q:to/OUT/);
 
 *
 
@@ -28,8 +28,6 @@ i
 
 OUT
 
-);
-
 $otx.validate(q:to/HERE/);
   begin:
     regexp: \w+
@@ -44,7 +42,7 @@ say "--------------------------------------------";
 
 $otx = Outhentix::DSL.new( 
   debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
-  output => q:to/OUT/
+  output => q:to/OUT/);
 
 ***
 
@@ -65,8 +63,6 @@ h
 
 OUT
 
-);
-
 $otx.validate(q:to/HERE/);
   begin:
     regexp: \w+
@@ -83,7 +79,7 @@ say "--------------------------------------------";
 
 $otx = Outhentix::DSL.new( 
   debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
-  output => q:to/OUT/
+  output => q:to/OUT/);
 
 a
 b
@@ -102,8 +98,6 @@ j
 
 OUT
 
-);
-
 $otx.validate(q:to/HERE/);
   begin:
     regexp: \w+
@@ -112,6 +106,5 @@ $otx.validate(q:to/HERE/);
 HERE
 
 is-deeply $otx.stream, [ [ 'a', 'b'], [ 'c', 'd' ], [ 'd', 'e' ],  [ 'f', 'g'],  [ 'i', 'j'] ], 'five dubs search';
-
 
 done-testing;
