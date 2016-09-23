@@ -45,7 +45,7 @@ class Outhentix::DSL::Context::TextBlock {
 
        say %!chains if $debug-mode;
 
-       SUCC: for @succeeded -> $c {
+       for @succeeded -> $c {
 
             CHAIN: for %!chains.keys.sort({$^a <=> $^b}) -> $cid {
                 next CHAIN if %live-chains{$cid};
