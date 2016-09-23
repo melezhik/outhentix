@@ -39,7 +39,7 @@ cmp-ok $otx.results[2]<message>, '~~', /'[b] output match' .* 'there was'/, 'cor
 cmp-ok $otx.results[3]<message>, '~~', /'[b] output match' .* 'Bo*'/, 'correct message (regexp: Bo*)';
 
 for 0 ... 3 -> $i {
-  cmp-ok $otx.results[1]<type>, 'eq', 'check-expression', 'correct type (check N ' ~ $i ~ ')';
+  cmp-ok $otx.results[$i]<type>, 'eq', 'check-expression', 'correct type (check N ' ~ $i ~ ')';
 }
 
 done-testing;

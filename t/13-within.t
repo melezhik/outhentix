@@ -28,6 +28,6 @@ cmp-ok $otx.results[1]<message>, '~~', /'HELLO WORLD!!!' .* 'match \'WORLD ...'/
 cmp-ok $otx.results[2]<message>, '~~', /'output match' .* 'goodbye!'/, 'correct message (plain text check - goodbye!)';
 
 for 0 ... 2 -> $i {
-  cmp-ok $otx.results[1]<type>, 'eq', 'check-expression', 'correct type (check N ' ~ $i ~ ')';
+  cmp-ok $otx.results[$i]<type>, 'eq', 'check-expression', 'correct type (check N ' ~ $i ~ ')';
 }
 done-testing;

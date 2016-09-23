@@ -8,33 +8,31 @@ class Outhentix::DSL::Context::Range {
   has @.ranges;
   has %.bad-ranges;
 
+
   method change-context ( @current-context, @original-context, @succeeded ) {
 
     my @new-ctx = Array.new;
-
-    my @chunk = Array.new;
 
     my $inside = False;
 
     my $a-index;
     my $b-index;
 
+    my $bl = $!bound-left;
+    my $br = $!bound-right;
+
+    #say "bound-left: $bl";
+    #say "bound-right: $br";
+
     SUCC: for @current-context -> $c {
 
-        my $br = $!bound-right;
+        if $inside and $c[0] ~~ m/$br/ {
 
-        if $inside and not $c[0] ~~ m/{$br}/ {
-            @chunk.push: $c;
-            next SUCC;
-        }
+            @new-ctx.push: $c;
 
-        if $inside and $c[0] ~~ m/{$br}/ {
+            @new-ctx.push: ["#dsl_note: end range ($br) . last element - {@new-ctx[*-2][0]}"];
 
-            @new-ctx.push: @chunk;
-
-            @new-ctx.push: ["#dsl_note: end range"];
-
-            @chunk = Array.new;
+            #say "end range - $c";
 
             $inside = False;
 
@@ -46,25 +44,39 @@ class Outhentix::DSL::Context::Range {
             }
 
             next SUCC;
+        } 
 
-        }
+        if $inside {
 
+            #say "inside range - $c";
 
-        my $bl = $!bound-left;
+            @new-ctx.push: $c;
 
-        if $c[0] ~~ m/{$bl}/ and not %!bad-ranges{$c[1]}:exists {
+        } 
+
+        if $c[0] ~~ m/$bl/ and not %!bad-ranges{$c[1]}:exists {
+
+            #say "start range - $c";
+
             $inside = True;
             $a-index = $c[1];
-            @chunk.push: ["#dsl_note: start range"];
 
-            next SUCC;
+            @new-ctx.push: $c;
 
-        }
+            @new-ctx.push: ["#dsl_note: start range ($bl)"];
+
+      }
 
     }
 
+    #say @new-ctx;
+
     return @new-ctx;
 
+  }
+
+  method update-stream (@current-context, @original-context, @succeeded , @stream, $debug-mode = False ) {
+    return
   }
 
 

@@ -415,7 +415,7 @@ class Outhentix::DSL {
 
             self!add-result({ status => $status , message => $message });
 
-        } elsif $l ~~ m/^\s*between:\s+(.*)/ { # range context
+        } elsif $l ~~ m/^\s*between\:\s+(.*)/ { # range context
 
                         
             die "you can't switch to range context mode when within mode is enabled" if $!within-mode;
