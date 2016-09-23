@@ -28,10 +28,8 @@ class Outhentix::DSL::Context::TextBlock {
 
     say "succeeded: " ~ (@succeeded) if $debug-mode;
 
-    my $chain-first = %!chains ?? False !! True;;
-
     if $debug-mode {
-      say "doing chain initilization ... " if $chain-first;
+      say "doing chain initilization ... " if %!chains;
     }
 
     if @succeeded {
@@ -67,14 +65,13 @@ class Outhentix::DSL::Context::TextBlock {
 
     }
 
-    # remove unsuccessfull chains
-
     say 'live chains IDs: ' ~ %live-chains.keys.sort({$^a <=> $^b}) if $debug-mode;
 
     @stream  = Array.new;
 
 
     # delete failed chains
+
     for %!chains.keys.sort({$^a <=> $^b}) -> $cid {
       if %live-chains{$cid}:exists {        
           @stream.push: [ %!chains{$cid}.map: { $_[0] } ]
