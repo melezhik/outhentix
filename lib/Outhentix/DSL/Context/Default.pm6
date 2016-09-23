@@ -6,7 +6,7 @@ class Outhentix::DSL::Context::Default {
     @current-context    
   }
 
-  method update-stream (@current-context, @original-context, @succeeded , %stream, $debug-mode = False ) {
+  method update-stream (@current-context, @original-context, @succeeded , @stream, $debug-mode = False ) {
     return
   }
 };
