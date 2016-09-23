@@ -416,14 +416,24 @@ class Outhentix::DSL {
             self!add-result({ status => $status , message => $message });
 
         } elsif $l ~~ m/^\s*between:\s+(.*)/ { # range context
-            
+
+                        
+            die "you can't switch to range context mode when within mode is enabled" if $!within-mode;
+            die "you can't switch to range context mode when block mode is enabled" if $!block-mode;
+
+            my $pattern = $0.Str;
+
             self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
-            $!context-modificator = Outhentix::DSL::Context::Range.new($0);
+            my ($a, $b) = split /\s+/, $pattern;
+        
+            $a ~~ s:g/\s//; $b ~~ s:g/\s//;
+        
+            $a ||= '.*';
+            $b ||= '.*';
+        
+            $!context-modificator = Outhentix::DSL::Context::Range.new( bound-left => $a , bound-right => $b );
 
-            die "you can't switch to range context mode when within mode is enabled" if $!within-mode;
-
-            die "you can't switch to range context mode when block mode is enabled" if $!block-mode;
 
         } elsif $l ~~ m/^\s*(code|generator|validator)\:\s*(.*)/  {
 
