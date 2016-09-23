@@ -24,7 +24,7 @@ class Outhentix::DSL {
   has Str $.output;
   has Int $.match-l = 40;
   has %.languages;
-  has %.stream;
+  has @.stream;
   has Int $.debug-mode = 0;
   has Str $.cache-dir = %*ENV<OTX_CACHE_DIR> ?? %*ENV<OTX_CACHE_DIR>.Str !! '/tmp';
 
@@ -325,7 +325,7 @@ class Outhentix::DSL {
       @!current-context, 
       @!original-context, 
       @!succeeded, 
-      %!stream,
+      @!stream,
       %*ENV<OTX_STREAM_DEBUG> ?? True !! False
     );
 

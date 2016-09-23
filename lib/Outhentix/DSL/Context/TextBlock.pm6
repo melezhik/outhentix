@@ -20,15 +20,19 @@ class Outhentix::DSL::Context::TextBlock {
 
   }
 
-  method update-stream (@current-context, @original-context, @succeeded , %stream, $debug-mode = False ) { 
+  method update-stream (@current-context, @original-context, @succeeded , @stream, $debug-mode = False ) { 
 
-    my %actual-chains = Hash.new;
+    my %live-chains = Hash.new;
 
     say "start update-stream ..." if $debug-mode;
 
     say "succeeded: " ~ (@succeeded) if $debug-mode;
 
-    my $chain-updated = False;
+    my $chain-first = %!chains ?? False !! True;;
+
+    if $debug-mode {
+      say "doing chain initilization ... " if $chain-first;
+    }
 
     if @succeeded {
 
@@ -38,50 +42,52 @@ class Outhentix::DSL::Context::TextBlock {
             }
        };
 
+ 
        say 'old chains ...' if $debug-mode;
 
        say %!chains if $debug-mode;
- 
-       for @succeeded -> $c {
 
+       SUCC: for @succeeded -> $c {
 
-            CHAIN: for %!chains.keys.sort -> $cid {
+            CHAIN: for %!chains.keys.sort({$^a <=> $^b}) -> $cid {
+                next CHAIN if %live-chains{$cid};
                 if %!chains{$cid}[*-1][1] == $c[1]-1 {
-                    %actual-chains{$cid} = 1;
-                    # succeeded element belongs only to a ONE chain!
+                    %live-chains{$cid} = True;
+                    say "add node $c to chain Num $cid (" ~ %!chains{$cid}[*-1][0] ~ ")"  if $debug-mode;
                     %!chains{$cid}.push: $c;
-                    $chain-updated = True; 
+                    last CHAIN;
+                } elsif %!chains{$cid}[*-1][1] == $c[1] {
+                    %live-chains{$cid} = True;
                     last CHAIN;
                 }
+                
             }
+
         }
-
-       
-       say 'new chains ...' if $debug-mode;
-
-       say %!chains if $debug-mode;
 
     }
 
     # remove unsuccessfull chains
 
+    say 'live chains IDs: ' ~ %live-chains.keys.sort({$^a <=> $^b}) if $debug-mode;
 
-    say 'actual chains: ' ~ %actual-chains.keys.sort if $debug-mode;
+    @stream  = Array.new;
 
-    if $chain-updated {
 
-      %stream = Hash.new;
-
-      for %actual-chains.keys -> $cid {
-          %stream{$cid} = %!chains{$cid};
+    # delete failed chains
+    for %!chains.keys.sort({$^a <=> $^b}) -> $cid {
+      if %live-chains{$cid}:exists {        
+          @stream.push: [ %!chains{$cid}.map: { $_[0] } ]
+      } else {
+          say "delete chain: $cid ..." if $debug-mode;
+          %!chains{$cid}:delete
       }
     }
 
-   say 'current stream ...' if $debug-mode;
 
-   %!chains = %stream;
- 
-   say %stream if $debug-mode;
+   say 'actual chains: ' ~ "\n" ~ %!chains if $debug-mode;
+
+   say 'current stream ...' ~ @stream.perl if $debug-mode;
 
   }
   

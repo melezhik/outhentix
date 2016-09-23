@@ -20,6 +20,12 @@ my $otx = Outhentix::DSL.new(
   e
   f
 
+  *
+
+  g
+  h
+  i
+
 OUT
 
 );
@@ -34,6 +40,45 @@ HERE
 
 $otx.stream.say;
 
+say "--------------------------------------------";
+
+
+$otx = Outhentix::DSL.new( 
+  debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
+  output => q:to/OUT/
+
+  *
+
+  a
+  b
+  c
+
+  *
+
+  d
+  e
+
+  *
+
+  f
+  g
+  h
+
+OUT
+
+);
+
+$otx.validate(q:to/HERE/);
+  begin:
+    regexp: \w+
+    regexp: \w+
+    regexp: \w+
+  end:
+HERE
+
+$otx.stream.say;
+
+say "--------------------------------------------";
 
 $otx = Outhentix::DSL.new( 
   debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
