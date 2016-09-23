@@ -228,7 +228,12 @@ class Outhentix::DSL {
     my @context-new = Array.new;
 
     # dynamic context
-    my @dc = $!context-modificator.change-context(@!current-context,@!original-context, @!succeeded);
+    my @dc = $!context-modificator.change-context(
+      @!current-context,
+      @!original-context, 
+      @!succeeded,
+      %*ENV<OTX_STREAM_DEBUG> ?? True !! False
+    );
 
     @!succeeded = Array.new;
 

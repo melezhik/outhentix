@@ -2,7 +2,7 @@ use v6;
 
 class Outhentix::DSL::Context::Default { 
 
-  method change-context (@current-context, @original-context, @succeeded ) {
+  method change-context (@current-context, @original-context, @succeeded, $debug-mode = False  ) {
     @current-context    
   }
 

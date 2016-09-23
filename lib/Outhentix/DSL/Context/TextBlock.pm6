@@ -4,7 +4,7 @@ class Outhentix::DSL::Context::TextBlock {
 
   has %.chains;
 
-  method change-context ( @current-context, @original-context, @succeeded ) {
+  method change-context ( @current-context, @original-context, @succeeded, $debug-mode = False  ) {
 
     my @new-ctx = Array.new;
 
