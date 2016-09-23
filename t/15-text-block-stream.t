@@ -8,61 +8,23 @@ my $otx = Outhentix::DSL.new(
   debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
   output => q:to/OUT/
 
-  *
+*
 
-  a
-  b
-  c
+a
+b
+c
 
-  *
+*
 
-  d
-  e
-  f
+d
+e
+f
 
-  *
+*
 
-  g
-  h
-  i
-
-OUT
-
-);
-
-$otx.validate(q:to/HERE/);
-  begin:
-    regexp: \w+
-    regexp: \w+
-    regexp: \w+
-  end:
-HERE
-
-$otx.stream.say;
-
-say "--------------------------------------------";
-
-
-$otx = Outhentix::DSL.new( 
-  debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
-  output => q:to/OUT/
-
-  *
-
-  a
-  b
-  c
-
-  *
-
-  d
-  e
-
-  *
-
-  f
-  g
-  h
+g
+h
+i
 
 OUT
 
@@ -76,7 +38,7 @@ $otx.validate(q:to/HERE/);
   end:
 HERE
 
-$otx.stream.say;
+is-deeply $otx.stream, [ [  'a', 'b', 'c' ], [  'd', 'e', 'f'], [  'g', 'h', 'i'] ], 'three triads search';
 
 say "--------------------------------------------";
 
@@ -84,20 +46,59 @@ $otx = Outhentix::DSL.new(
   debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
   output => q:to/OUT/
 
-  a
-  b
+***
 
-  c
-  d
-  e
+a
+b
+c
+
+*
+
+d
+e
+
+***
+
+f
+g
+h
+
+OUT
+
+);
+
+$otx.validate(q:to/HERE/);
+  begin:
+    regexp: \w+
+    regexp: \w+
+    regexp: \w+
+  end:
+HERE
+
+
+is-deeply $otx.stream, [ [  'a', 'b', 'c' ], [ 'f', 'g', 'h' ] ], 'fisrt and last triads search';
+
+
+say "--------------------------------------------";
+
+$otx = Outhentix::DSL.new( 
+  debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
+  output => q:to/OUT/
+
+a
+b
+
+c
+d
+e
   
-  f
-  g
+f
+g
 
-  h
+h
 
-  i
-  j
+i
+j
 
 OUT
 
@@ -110,6 +111,7 @@ $otx.validate(q:to/HERE/);
   end:
 HERE
 
-$otx.stream.say;
+is-deeply $otx.stream, [ [ 'a', 'b'], [ 'c', 'd' ], [ 'd', 'e' ],  [ 'f', 'g'],  [ 'i', 'j'] ], 'five dubs search';
+
 
 done-testing;
