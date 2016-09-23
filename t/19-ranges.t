@@ -23,16 +23,16 @@ HERE
 
 isa-ok $otx.results, 'Array';
 
-#cmp-ok $otx.results.elems, '==', 1, 'correct array length';
+cmp-ok $otx.results.elems, '==', 1, 'correct array length';
 
-#ok $otx.results[0]<status>, 'correct status';
+ok $otx.results[0]<status>, 'correct status';
 
-#cmp-ok $otx.results[0]<message>, '~~', /'[b] output match' .* 'between: foo foo'/, 'correct message (between regexp)';
+cmp-ok $otx.results[0]<message>, '~~', /'output match' .* '\d'/, 'correct message';
 
-#cmp-ok $otx.results[0]<type>, 'eq', 'check-expression', 'correct type';
+cmp-ok $otx.results[0]<type>, 'eq', 'check-expression', 'correct type';
 
 
-say $otx.results;
+#say $otx.results;
 
 
 done-testing;
