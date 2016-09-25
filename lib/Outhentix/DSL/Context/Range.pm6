@@ -113,7 +113,7 @@ class Outhentix::DSL::Context::Range {
     @stream = Array.new;
 
 
-    for %!chains.keys -> $cid {
+    for %!chains.keys.sort({$^a <=> $^b}) -> $cid {
 
       if %live-ranges{$cid}:exists {
         say "keep range: $cid ..." if $debug-mode;
