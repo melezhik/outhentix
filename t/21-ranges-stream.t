@@ -59,4 +59,15 @@ is-deeply $otx.captures, [
   ["11"], ["12"]], 
 'correct captures';
 
+$otx.validate(q:to/HERE/);
+  reset_context:
+  regexp: (\d+)
+HERE
+
+is-deeply $otx.captures, [
+  ["100"], ["0"], ["3"], 
+  ["4"], ["5"], ["6"], ["7"], ["8"], ["9"], ["10"], 
+  ["11"], ["12"], ["1"], ["2"], ["73"]
+], 'correct captures, without range applied';
+
 done-testing;
