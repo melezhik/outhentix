@@ -53,5 +53,10 @@ is-deeply $otx.stream, [
   ["    6", "    7", "    8", "    9", "    10", "    11", "    12"],
 ], 'correct stream';
 
+is-deeply $otx.captures, [
+  ["0"], ["3"], ["4"], ["5"], 
+  ["6"], ["7"], ["8"], ["9"], ["10"], 
+  ["11"], ["12"]], 
+'correct captures';
 
 done-testing;
