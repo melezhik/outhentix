@@ -32,7 +32,7 @@ class Outhentix::DSL::Context::Range {
 
         if $inside and $c[0] ~~ m/$br/ {
 
-            @new-ctx.push: ["#dsl_note: end range ($br) . last element - {@new-ctx[*-2][0]}"];
+            @new-ctx.push: ["#dsl_note: end range ($br) . last element - {@new-ctx[*-1][0]}"];
 
             say "end range - $c" if $debug-mode;
 
