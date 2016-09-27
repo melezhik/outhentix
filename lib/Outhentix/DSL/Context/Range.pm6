@@ -13,6 +13,7 @@ class Outhentix::DSL::Context::Range {
   method change-context ( @current-context, @original-context, @succeeded, $debug-mode = False ) {
 
     my @new-ctx = Array.new;
+    my @chunk = Array.new;
 
     my $inside = False;
 
@@ -32,7 +33,7 @@ class Outhentix::DSL::Context::Range {
 
         if $inside and $c[0] ~~ m/$br/ {
 
-            @new-ctx.push: ["#dsl_note: end range ($br) . last element - {@new-ctx[*-1][0]}"];
+            @chunk.push: ["#dsl_note: end range ($br) . last element - $c"];
 
             say "end range - $c" if $debug-mode;
 
@@ -45,6 +46,10 @@ class Outhentix::DSL::Context::Range {
                 @!ranges.push: [$a-index, $b-index];
             }
 
+            for @chunk -> $j {
+              @new-ctx.push: [$j[0],$j[1]];
+            }
+            @chunk = Array.new;
             next SUCC;
         } 
 
@@ -52,18 +57,16 @@ class Outhentix::DSL::Context::Range {
 
             say "inside range - $c" if $debug-mode;
 
-            @new-ctx.push: $c;
+            @chunk.push: $c;
 
-        } 
-
-        if $c[0] ~~ m/$bl/ and not %!bad-ranges{$c[1]}:exists {
+        } elsif $c[0] ~~ m/$bl/ and not %!bad-ranges{$c[1]}:exists {
 
             say "start range - $c" if $debug-mode;
 
             $inside = True;
             $a-index = $c[1];
 
-            @new-ctx.push: ["#dsl_note: start range ($bl)"];
+            @chunk.push: ["#dsl_note: start range ($bl) first element - $c"];
 
       }
 

@@ -47,8 +47,12 @@ cmp-ok $otx.results[0]<message>, '~~', /'output match' .* '(\d+)'/, 'correct mes
 
 cmp-ok $otx.results[0]<type>, 'eq', 'check-expression', 'correct type';
 
-#is-deeply $otx.captures, [], 'correct stream';
+is-deeply $otx.captures, [
+["1"], ["2"], ["3"], ["100"]
+], 'correct captures';
 
-say $otx.captures;
+is-deeply $otx.stream, [
+  ["1", "2", "3", "    100"],
+], 'correct stream';
 
 done-testing;
