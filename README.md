@@ -7,7 +7,7 @@ Outhentix::DSL
 
 # NOTE
 
-Outhentix::DSL is a perl6 replacement of [Outhentix::DSL](https://github.com/melezhik/outhentix-dsl)
+Outhentix::DSL is a Perl6 replacement of [Outthentic::DSL](https://github.com/melezhik/outthentic-dsl)
 
 # SYNOPSIS
 
