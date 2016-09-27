@@ -119,13 +119,13 @@ Outhentix::DSL provides program api for client applications:
     use Outhentix::DSL;
 
     my $otx = Outhentix::DSL.new( output => q:to/HERE/);
-    Hello
-    My name is Outhentix!
+        Hello
+        My name is Outhentix!
     HERE
 
     $outh->validate(q:to/CHECK/);
-    Hello
-    regexp: My \s+ name \s+ is 
+        Hello
+        regexp: My \s+ name \s+ is 
     CHECK
 
     for otx.results -> $r {
@@ -138,11 +138,11 @@ Methods list:
 
 This is constructor, create Outhentix::DSL instance. 
 
-Obligatory parameters is:
+Obligatory parameters are:
 
 * input text string 
 
-Optional parameters is passed as hashref:
+Optional parameters are passed as hash:
 
 * match_l - truncate matching strings to {match_l} bytes
 
@@ -164,11 +164,11 @@ Perform verification process.
 
 Obligatory parameter is:
 
-* a path to file with DSL code
+* a string with DSL code
 
 ### results  
 
-Returns validation results as arrayref containing { type, status, message } hashrefs.
+Returns validation results as array containing { type, status, message } hashes.
 
 ## Outhentix clients
 
