@@ -144,9 +144,9 @@ input text to get verified
 
 Optional parameters are passed as hash:
 
-* check-max-len - truncate check expressions to a \`check-max-len' bytes when generating results:
+* check-max-len - truncate check expressions to a \`check-max-len' bytes when generating results
 
-Default value is \`40'. This is useful debugging long check expressions:
+This is useful when debugging long check expressions:
 
     use v6;
     
@@ -161,6 +161,8 @@ Default value is \`40'. This is useful debugging long check expressions:
 Output:
 
     [{message => text match '123456789 ...', status => True, type => check-expression}]
+
+Default value is \`40'.
 
 * debug-mode - enable debug mode
 
@@ -179,6 +181,8 @@ Perform verification process.
 Obligatory parameter is:
 
 * a string with DSL code
+
+Example:
 
     $otx.validate( q:to/CHECK/);
 
@@ -261,7 +265,7 @@ There are two basic types of check expressions:
 
 # Plain text expressions 
 
-Plain text expressions are just a lines should be _included_ at input text stream.
+Plain text expressions define a lines to exists (included) at input text stream.
 
 DSL code:
         
@@ -291,8 +295,8 @@ Similarly to plain text matching, you may require that input lines match some re
 DSL code:
 
     regexp: \d\d\d\d-\d\d-\d\d # date in format of YYYY-MM-DD
-    regexp: Name: \w+ # name
-    regexp: App Version Number: \d+\.\d+\.\d+ # version number
+    regexp: 'Name:' \s+ \w+ # name
+    regexp: 'App Version Number:' \s+ \d+\.\d+\.\d+ # version number
 
 Input text:
 
@@ -305,27 +309,33 @@ Result - verified
  
 # One or many?
 
-Parser does not care about _how many times_ a given check expression is matched in input text.
+Parser does not care about _how many times_ a given check expression matches an input text.
 
-If at least one line in a text match the check expression - _this check_ is considered as succeeded.
+If at least _one line_ in a text matches the check expression - _this check_ is considered as successful.
 
-Parser  _accumulate_ all matching lines for given check expression, so they could be processed.
+If you use capturing regex expression, parser  _accumulates_ all captured data to make it possible further proccessing:
 
-Input text:
-
-    1 - for one
-    2 - for two
-    3 - for three       
-
-    regexp: (\d+) for (\w+)
-    code: for my $c( @{captures()}) {  print $c->[0], "/", $c->[1], "\n"}
+    use v6;
+    
+    use Outhentix::DSL;
+    
+    my $otx = Outhentix::DSL.new( text => q:to/HERE/ );
+        1 - for one
+        2 - for two
+        3 - for three
+    HERE
+    
+    $otx.validate(q:to/CHECK/);
+    
+    regexp: (\d+) \s+ \- \s+ for \s+ (\w+)
+    
+    CHECK
+    
+    $otx.captures.perl.say;
 
 Output:
 
-    1/one
-    2/two
-    3/three
-
+    [["1", "one"], ["2", "two"], ["3", "three"]]
 
 See ["captures"](#captures) section for full explanation of a captures mechanism:
 
