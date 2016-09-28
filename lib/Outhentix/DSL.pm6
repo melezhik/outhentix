@@ -115,7 +115,11 @@ class Outhentix::DSL {
   
         self!debug("running inline perl6: $code") if $!debug-mode >= 2;
 
-        $result = (EVAL $code).join("\n");
+        #my $b = (self but role :: { method eval ($c) { EVAL $c; self } });
+
+        #$result = ($b.eval($code)||[]).join("\n");
+
+        $result = ((EVAL $code)||[]).join("\n");
   
         self!debug("perl6 code OK. code: $code") if $!debug-mode >= 2;
   
