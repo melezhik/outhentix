@@ -52,8 +52,7 @@ You define rules ( check expressions ) to describe expected content.
 
 ### Imperative way
 
-You _extend_ a process of verification using regular programming languages - like Perl6, Perl5, Bash and Ruby, see
-examples below.
+You _extend_ a process of verification using regular programming languages - like Perl6, Perl5, Bash and Ruby, see examples below.
 
 
 ## DSL code
@@ -290,7 +289,11 @@ Results: not verified
     
 # Regular expressions
 
-Similarly to plain text matching, you may require that input lines match some regular expressions:
+Similarly to plain text matching, you may require that input lines match some regular expressions.
+
+This should be [Perl6 Regular Expressions](https://docs.perl6.org/language/regexes).
+
+Example:
 
 DSL code:
 
@@ -313,7 +316,7 @@ Parser does not care about _how many times_ a given check expression matches an 
 
 If at least _one line_ in a text matches the check expression - _this check_ is considered as successful.
 
-If you use capturing regex expression, parser  _accumulates_ all captured data to make it possible further proccessing:
+If you use capturing regex expressions, parser  _accumulates_ all captured data to make it possible further proccessing:
 
     use v6;
     
@@ -341,12 +344,11 @@ See ["captures"](#captures) section for full explanation of a captures mechanism
 
 # Comments, blank lines and text blocks
 
-Comments and blank lines don't impact verification process but one could use them to improve code readability.
+Comments and blank lines don't impact verification process but you may use them for the sake of DSL code readability.
 
 # Comments
 
-Comment lines start with \`#' symbol, comments chunks are ignored by parser.
-
+Comment lines start with \`#' symbol, comments are ignored by parser.
 
 DSL code:
 
@@ -368,9 +370,9 @@ DSL code:
     # end has the end
     The end of a story
 
-But you **can't ignore** blank lines in a \`text block' context ( see \`text blocks' subsection ).
+But you **can't ignore** blank lines in a _text blocks_, [text blocks](#text-blocks) subsection for details.
 
-Use \`:blank_line' marker to match blank lines.
+Use \`:blank_line' marker to match blank lines inside text blocks.
 
 DSL code:
 
@@ -386,7 +388,7 @@ DSL code:
 
 # Text blocks
 
-Sometimes it is very helpful to match against a \`sequence of lines' like here.
+Sometimes it is very helpful to match against a _sequence of lines_ like in code below.
 
 DSL code:
 
@@ -425,7 +427,7 @@ Input text:
 
 Result - not verified
 
-\`begin:' \`end:' markers decorate \`text blocks' content. 
+\`begin:' \`end:' markers decorate text blocks content. 
 
 Markers should not be followed by any text at the same line.
 
