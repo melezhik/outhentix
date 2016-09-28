@@ -6,7 +6,7 @@ ok 1, 'Module loaded';
 
 my $otx = Outhentix::DSL.new( 
   debug-mode => %*ENV<OTX_DEBUG> ?? %*ENV<OTX_DEBUG>.Int !! 0,
-  output => q:to/OUT/
+  text => q:to/OUT/
 foo
     1
     2
@@ -28,7 +28,7 @@ cmp-ok $otx.results.elems, '==', 1, 'correct array length';
 
 ok $otx.results[0]<status>, 'correct status';
 
-cmp-ok $otx.results[0]<message>, '~~', /'output match' .* 1/, 'correct message';
+cmp-ok $otx.results[0]<message>, '~~', /'text match' .* 1/, 'correct message';
 
 cmp-ok $otx.results[0]<type>, 'eq', 'check-expression', 'correct type';
 
@@ -46,7 +46,7 @@ cmp-ok $otx.results.elems, '==', 2, 'correct array length (2)';
 
 ok $otx.results[1]<status>, 'correct status';
 
-cmp-ok $otx.results[1]<message>, '~~', /'output match' .* 2/, 'correct message (2)';
+cmp-ok $otx.results[1]<message>, '~~', /'text match' .* 2/, 'correct message (2)';
 
 cmp-ok $otx.results[1]<type>, 'eq', 'check-expression', 'correct type (2)';
 

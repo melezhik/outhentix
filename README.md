@@ -104,58 +104,67 @@ This is schematic description of the process:
 
     Check if all check steps are succeeded. If so then input text is considered verified, else - not verified.
 
-A final _presentation_ of verification results should be implemented in a certain [client](#clients) _using_ [parser api](#parser-api) and not being defined at this scope. 
+A final _presentation_ of verification results should be implemented in a certain [client](#clients) _using_ [parser api](#parser-api) and not being defined at this scope.  
 
-For the sake of readability a _fake_ results presentation layout is used in this document. 
 
 ## Parser API
 
-Outhentix::DSL provides program api for client applications:
+Outhentix::DSL provides program API for _client applications_. 
+
+This is example of verification some text against 2 lines;
 
     use v6;
-    use Test;
-
+    
     use Outhentix::DSL;
-
-    my $otx = Outhentix::DSL.new( output => q:to/HERE/);
+    
+    my $otx = Outhentix::DSL.new( text => q:to/HERE/ );
         Hello
         My name is Outhentix!
     HERE
-
-    $outh->validate(q:to/CHECK/);
+    
+    $otx.validate(q:to/CHECK/);
         Hello
-        regexp: My \s+ name \s+ is 
+        regexp: My \s+ name \s+ is
     CHECK
-
-    for otx.results -> $r {
-        ok $r{status}, $r{message} if $r{type} eq 'check_expression';
+    
+    for $otx.results -> $r {
+        say $r
     }
 
+Output:
+
+  {message => output match 'Hello ...', status => True, type => check-expression}
+  {message => output match 'My \s+ name \s+ is ...', status => True, type => check-expression}
+    
 Methods list:
 
 ### new
 
-This is constructor, create Outhentix::DSL instance. 
+This is constructor to create an Outhentix::DSL instance. 
 
 Obligatory parameters are:
 
-* input text string 
+* text
+
+input text to get verified
+
+  Outhentix::DSL.new( text => 'Hello!' ~ "\n" ~ "Please, Verify me!" );
 
 Optional parameters are passed as hash:
 
-* match_l - truncate matching strings to {match_l} bytes
+* match-l - truncate matching strings to {match_l} bytes
 
 Default value is \`40'
 
-* debug_mod - enable debug mode
+* debug-mode - enable debug mode
 
-    * Possible values is 0,1,2,3.
+    * Possible values is one of: 0,1,2,3,4
 
-    * Set to 1 or 2 or 3 if you want to see some debug information in validation results.
+    * Set to 1 or 2 or 3 or 4 if you want to see some debug information appeared at console.
 
-    * Increasing debug_mod value means more low level information appeared.
+    * Increasing debug-mode value results in more low level information appeared.
 
-    * Default value is \`0' - means do not create debug messages.
+    * Default value is \`0' - means do not emit debug messages.
 
 ### validate
 
@@ -173,11 +182,9 @@ Returns validation results as array containing { type, status, message } hashes.
 
 Client is a external program using DSL API. Existed outhentix clients:
 
-* [Swat](https://github.com/melezhik/swat) - web application testing tool
+* [Swat6](https://github.com/melezhik/swat6) - web application testing tool ( TODO )
 
-* [Outhentix](https://github.com/melezhik/outhentix) -  multipurpose scenarios framework
-
-More clients wanted :) , please [write me](mailto:melezhik@gmail.com) if you have one!
+* [Outhentix::Client](https://github.com/melezhik/outhentix-client) -  multipurpose scenarios framework ( TODO )
 
 # DSL code syntax
 

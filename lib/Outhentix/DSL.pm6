@@ -21,7 +21,7 @@ class Outhentix::DSL {
   has @.captures;
   has Str $.last-match-line;
   has Bool $.last-check-status;
-  has Str $.output;
+  has Str $.text;
   has Int $.match-l = 40;
   has %.languages;
   has @.stream;
@@ -59,7 +59,7 @@ class Outhentix::DSL {
   
       my @context = Array.new;
   
-      for ($!output ?? $!output.lines !! [] ) -> $ll {
+      for ($!text ?? $!text.lines !! [] ) -> $ll {
 
           my $l = $ll.chomp;
 
@@ -142,9 +142,9 @@ class Outhentix::DSL {
 
     if $!within-mode {
       $msg = $!last-check-status ?? "'" ~ self!short-string($!last-match-line) ~ "' match /$line/"
-      !! "output match /$line/";
+      !! "text match /$line/";
     }else{
-        $msg = "output match /$line/";
+        $msg = "text match /$line/";
     }
 
     $!within-mode = True;
@@ -178,11 +178,11 @@ class Outhentix::DSL {
         $reset-context = True;
         
         $msg = $!last-check-status ?? "'" ~ self!short-string($!last-match-line) 
-        ~ "'" ~ ' match ' ~ "'" ~ $lshort ~ "'" !! "output match '" ~ $lshort ~ "'";
+        ~ "'" ~ ' match ' ~ "'" ~ $lshort ~ "'" !! "text match '" ~ $lshort ~ "'";
 
 
     } else {
-        $msg = $!block-mode ?? "[b] output match '$lshort'" !! "output match '$lshort'";
+        $msg = $!block-mode ?? "[b] text match '$lshort'" !! "text match '$lshort'";
     }
   
 
