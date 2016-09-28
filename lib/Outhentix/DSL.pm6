@@ -22,7 +22,7 @@ class Outhentix::DSL {
   has Str $.last-match-line;
   has Bool $.last-check-status;
   has Str $.text;
-  has Int $.match-l = 40;
+  has Int $.check-max-len = 40;
   has %.languages;
   has @.stream;
   has Int $.debug-mode = 0;
@@ -198,7 +198,7 @@ class Outhentix::DSL {
   
       my $orig-l = $l;
 
-      my $short-l = substr( $l, 0, $!match-l );
+      my $short-l = substr( $l, 0, $!check-max-len );
 
       $short-l ~~ s/\r//; $orig-l ~~ s/\r//;
   

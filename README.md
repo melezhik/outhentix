@@ -4,7 +4,6 @@ Outhentix::DSL
 
 [![Build Status](https://travis-ci.org/melezhik/outhentix-dsl.svg)](https://travis-ci.org/melezhik/outhentix-dsl)
 
-
 # NOTE
 
 Outhentix::DSL is a Perl6 replacement of [Outthentic::DSL](https://github.com/melezhik/outthentic-dsl)
@@ -24,12 +23,6 @@ Outhentix::DSL - language to verify (un)structured text.
     $ OTX_DEBUG=2 prove -e 'perl6 -I lib' -v -r t/
     $ panda --force install .
 
-# Environment variables
-
-I'll document these variables later. Here is just a list:
-
-* OTX_DEBUG (1,2,3,4)
-* OTX_STREAM_DEBUG (set|not set)
 
 # Glossary
 
@@ -69,9 +62,9 @@ A program code written on outhentix DSL language to verify text input.
 
 ## Search context
 
-Verification process is carried out in a given _context_.
+Verification process is taken in a  _context_.
 
-But default search context _is equal_ to an original text input.
+By default search context _is equal_ to an original text input stream.
 
 However a search context might be changed in some situations ( see within, text blocks and ranges expressions ).
 
@@ -84,7 +77,6 @@ DSL parser is the program which:
 * parses text input
 
 * verifies text input ( line by line ) against a check expressions ( line by line )
-
 
 ## Verification process
 
@@ -133,8 +125,8 @@ This is example of verification some text against 2 lines;
 
 Output:
 
-  {message => output match 'Hello ...', status => True, type => check-expression}
-  {message => output match 'My \s+ name \s+ is ...', status => True, type => check-expression}
+    {message => output match 'Hello ...', status => True, type => check-expression}
+    {message => output match 'My \s+ name \s+ is ...', status => True, type => check-expression}
     
 Methods list:
 
@@ -148,13 +140,27 @@ Obligatory parameters are:
 
 input text to get verified
 
-  Outhentix::DSL.new( text => 'Hello!' ~ "\n" ~ "Please, Verify me!" );
+    Outhentix::DSL.new( text => 'Hello!' ~ "\n" ~ "Please, Verify me!" );
 
 Optional parameters are passed as hash:
 
-* match-l - truncate matching strings to {match_l} bytes
+* match-l - truncate check expressions to a \`match-l' bytes when generating results:
 
-Default value is \`40'
+Default value is \`40'. This is useful debugging long check expressions:
+
+    use v6;
+    
+    use Outhentix::DSL;
+    
+    my $otx = Outhentix::DSL.new( text => [1...99].join(" ") , check-max-len => 9 );
+    
+    $otx.validate([1...99].join(" "));
+    
+    $otx.results.say;
+    
+Output:
+
+    [{message => text match '123456789 ...', status => True, type => check-expression}]
 
 * debug-mode - enable debug mode
 
@@ -173,6 +179,15 @@ Perform verification process.
 Obligatory parameter is:
 
 * a string with DSL code
+
+    $otx.validate( q:to/CHECK/);
+
+      # there should be digits
+      regexp: \d
+      # and greetings
+      regexp: hello \s+ \w+
+
+    CHECK
 
 ### results  
 
@@ -1322,6 +1337,19 @@ Output:
     # 1 3
     # 0 0 0
 
+# Examples
+
+Some code examples mostly mentioned at this documentation could be found at \`examples/' directory.
+
+But examing unit tests code under `t/' could be also very useful.
+
+
+# Environment variables
+
+I'll document these variables later. Here is just a list:
+
+* OTX_DEBUG (1,2,3,4)
+* OTX_STREAM_DEBUG (set|not set)
 
 # Author
 
