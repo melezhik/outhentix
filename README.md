@@ -165,7 +165,7 @@ Default value is \`40'.
 
 * debug-mode - enable debug mode
 
-    * Possible values is one of: 0,1,2,3,4
+    * Possible values is one of: `0,1,2,3,4`
 
     * Set to 1 or 2 or 3 or 4 if you want to see some debug information appeared at console.
 
@@ -312,11 +312,13 @@ Result - verified
  
 # One or many?
 
-Parser does not care about _how many times_ a given check expression matches an input text.
+* Parser does not care about _how many times_ a given check expression matches an input text.
 
-If at least _one line_ in a text matches the check expression - _this check_ is considered as successful.
+* If at least _one line_ in a text matches the check expression - _this check_ is considered as successful.
 
-If you use capturing regex expressions, parser  _accumulates_ all captured data to make it possible further proccessing:
+* If you use capturing regex expressions, parser  _accumulates_ all captured data to make it possible further proccessing.
+
+Example:
 
     use v6;
     
