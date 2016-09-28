@@ -246,7 +246,7 @@ DSL code:
     regexp: \d\d\d\d-\d\d-\d\d
 
 
-Results - verified:
+Result:
 
     +--------+------------------------------+
     | status | message                      |
@@ -276,7 +276,7 @@ Input text:
     I am ok , really
     HELLO Outhentix !!!
 
-Results: verified
+Result: verified
  
 Plain text expressions are case sensitive:
 
@@ -284,7 +284,7 @@ Input text:
 
     I am OK
  
-Results: not verified
+Result: not verified
 
     
 # Regular expressions
@@ -297,7 +297,7 @@ Example:
 
 DSL code:
 
-    regexp: \d\d\d\d-\d\d-\d\d # date in format of YYYY-MM-DD
+    regexp: \d\d\d\d \- \d\d \- \d\d # date in format of YYYY-MM-DD
     regexp: 'Name:' \s+ \w+ # name
     regexp: 'App Version Number:' \s+ \d+\.\d+\.\d+ # version number
 
@@ -741,7 +741,7 @@ DSL code:
 
 
 
-Results - not verified:
+Result - not verified:
 
     +--------+---------------------------------------+
     | status | message                               |
