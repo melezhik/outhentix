@@ -144,7 +144,7 @@ input text to get verified
 
 Optional parameters are passed as hash:
 
-* match-l - truncate check expressions to a \`match-l' bytes when generating results:
+* check-max-len - truncate check expressions to a \`check-max-len' bytes when generating results:
 
 Default value is \`40'. This is useful debugging long check expressions:
 
