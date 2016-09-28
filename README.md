@@ -65,15 +65,15 @@ examples below.
 
 ## DSL code
 
-A  program code written on outhentix DSL language to verify text input.
+A program code written on outhentix DSL language to verify text input.
 
 ## Search context
 
 Verification process is carried out in a given _context_.
 
-But default search context is the same as original input text stream. 
+But default search context _is equal_ to an original text input.
 
-Search context could be however changed in some conditions.
+However a search context might be changed in some situations ( see within, text blocks and ranges expressions ).
 
 ## DSL parser
 
@@ -83,7 +83,7 @@ DSL parser is the program which:
 
 * parses text input
 
-* verifies text input ( line by line ) against check expressions ( line by line )
+* verifies text input ( line by line ) against a check expressions ( line by line )
 
 
 ## Verification process
@@ -92,19 +92,18 @@ Verification process consists of matching lines of text input against check expr
 
 This is schematic description of the process:
 
+    For every check expression in a check expressions list:
+        * Mark this check step in `unknown' state.
+        * For every line in input text:
+            * Verify if it matches check expression. If line matches then mark step in `succeeded' state.
+            * Next line.
+        End of lines loop.
+        * If the check step marked in `unknown' state, then mark it in `failed' state.  
+        * Next check expression.
+    End of expressions loop.
 
-    For every check expression in check expressions list.
-        Mark this check step as in unknown state.
-        For every line in input text.
-            Does line match check expression? Check step is marked as succeeded.
-            Next line.
-        End of loop.
-        Is this check step marked in unknown state? Mark this check step as in failed state.  
-        Next check expression.
-    End of loop.
-    Are all check steps succeeded? Input text is verified.
-    Vise versa - input text is not verified.
-    
+    Check if all check steps are succeeded. If so then input text is considered verified, else - not verified.
+
 A final _presentation_ of verification results should be implemented in a certain [client](#clients) _using_ [parser api](#parser-api) and not being defined at this scope. 
 
 For the sake of readability a _fake_ results presentation layout is used in this document. 
