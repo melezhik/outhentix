@@ -383,7 +383,7 @@ DSL code:
     # end has the end
     The end of a story
 
-But you **can't ignore** blank lines in a _text blocks_, [text blocks](#text-blocks) subsection for details.
+But you **can't ignore** blank lines in a _text blocks_, see [text blocks](#text-blocks) subsection for details.
 
 Use `:blank_line` marker to match blank lines inside text blocks.
 
@@ -401,7 +401,7 @@ DSL code:
 
 # Text blocks
 
-Sometimes it is very helpful to match against a _sequence of lines_ like in code below.
+Sometimes you need to match a text against a _sequence of lines_ like in code below.
 
 DSL code:
 
@@ -415,7 +415,7 @@ DSL code:
         that string followed by
         another one
         # regexps patterns:
-        regexp: with (this|that)
+        regexp: 'with' \s+  'this' | 'that'
         # and the last one in a block
         at the very end
     end:
@@ -446,8 +446,8 @@ Markers should not be followed by any text at the same line.
 
 ## Don't forget to close the block ...
 
-Be aware if you leave "dangling" `begin:` marker without closing `end:` somewhere else 
-parser will remain in a _text block_ mode till the end of the file, which is probably not you want:
+Be aware if you leave "dangling" `begin:` marker without closing `end:` parser will remain in a _text block_ mode 
+till the end of the file, which is probably not you want:
 
 DSL code:
 
@@ -461,43 +461,50 @@ DSL code:
 
 Code expressions are just a pieces of 'some language code' you may inline and execute **during parsing** process.
 
-By default, if *language* is no set Perl language is assumed. Here is example:
+By default, if *language* is no set Perl6 language is assumed. Here is example:
 
-DSL code:
-
-    # Perl expression 
-    # between two check expressions
-    Once upon a time
-    code: print "hello I am Outhentix"
-    Lived a boy called Outhentix
-
-
+    use v6;
+    
+    use Outhentix::DSL;
+    
+    my $otx = Outhentix::DSL.new( text => 'hello' );
+    
+    $otx.validate(q:to/CHECK/);
+      hello
+      code: say "hi there!"
+    CHECK
+    
+    say $otx.results;
+    
 Output:
 
-    hello I am Outhentix
+    [{message => text match 'hello ...', status => True, type => check-expression}]
 
-Internally once DSL code gets parsed it is "turned" into regular Perl code:
+As you may notice code expression here has no impact on verification process, this trivial example just shows
+that you may inline some programming languages code into Outhentix DSL. See [generators](#generators) section on
+how dynamically create new check expressions using common programming languages. 
 
-    execute_check_expression("Once upon a time");
-    eval 'print "Lived a boy called Outhentix"';
-    execute_check_expression("Lived a boy called Outhentix");
 
-When use Perl expressions be aware of:
+You may use other languages in code expressions, not only Perl6. 
 
-* Perl expressions are executed by Perl eval function in context of `package main`, please be aware of that.
+Use `here` document style ( see [multiline expressions](#Multiline expressions) section ) and proper shebang to
+insert code written in otther languages. Here are some examples:
 
-* Follow [http://perldoc.perl.org/functions/eval.html](http://perldoc.perl.org/functions/eval.html) to know more about Perl eval function.
 
-One may use other languages in code expressions. Use should use `here` document style ( see [multiline expressions](#Multiline expressions) section ) to insert your code and
-set shebang to define a language. Here are some examples:
+## perl5
 
+    code:  <<HERE
+    !perl
+
+    print 'hi there!'
+    HERE
 
 ## bash 
 
     code:  <<HERE
     !bash
 
-    echo '# hello I am Outhentix'
+    echo 'hi there!'
     HERE
 
 
@@ -506,24 +513,32 @@ set shebang to define a language. Here are some examples:
     code: <<CODE
     !ruby
 
-    puts '# hello I am Outhentix'
+    puts 'hi there!'
     CODE
 
 # Asserts
 
-Asserts are simple statements with one of two values : true|false, a second assert parameter is just a description.
+Asserts expressions conists of assert value, and description - a short string to describe assert.
+
+Assert value should be _something_ to be treated as false or true, here some examples:
 
 DSL code
+    
+    # you may have assert expressions as is
+    # then assert value should be Perl6 value to be treated as true or false
+    # 
+    assert: 0 'this is not true in Perl6'
+    assert: 1 'this is true in Perl6'
+    assert: True 'True is for true in Perl6'
+    assert: False 'False is for false in Perl6'
 
-    assert: 0 'this is not true'
-    assert: 1 'this is true'
 
-Asserts almost always are created dynamically with generators. See next section.
+Asserts almost always to be created dynamically with generators. See the next section.
  
     
 # Generators
 
-* Generators is the way to _generate new outhentix entries on the fly_.
+* Generators is the way to _generate new outhentix entities on the fly_.
 
 * Generator expressions like code expressions are just a piece of code to be executed.
 
@@ -535,7 +550,7 @@ code should return reference to array of strings. Strings in array would _repres
 * If you use not Perl language in generator expressions to produce new outhentix entities you should print them
 into **stdout**. See examples below.
 
-* A new outhentix entries are passed back to parser and executed immediately.
+* A new outhentix entities are passed back to parser and executed immediately.
 
 Generators expressions start with `generator:` marker.
 
@@ -743,8 +758,9 @@ DSL code:
 
 
     # check list
+    # always
     # consists of
-    # single line entries
+    # single line expressions
 
     Multiline
     string
