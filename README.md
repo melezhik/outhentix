@@ -608,7 +608,7 @@ Updated check list:
     again
     
 
-Here is more complicated example using Perl5 language.
+Here is more complicated example using Perl6 language.
 
 DSL code:
 
@@ -617,15 +617,12 @@ DSL code:
     # and plain string check expressions:
 
     generator: <<CODE    
-    !perl
 
     my %d = { 
       'foo' => 'foo value', 
       'bar' => 'bar value' 
-    };     
-    [ 
-      map  { 
-        ( "# $_", "$data{$_}" )  
+    }.keys:map  { 
+         "# $_", %d{$_}
       } keys %d 
     ]
     CODE

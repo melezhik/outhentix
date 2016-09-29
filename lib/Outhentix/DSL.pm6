@@ -119,7 +119,7 @@ class Outhentix::DSL {
 
         #$result = ($b.eval($code)||[]).join("\n");
 
-        $result = ((EVAL $code)||[]).join("\n");
+        $result = (EVAL $code).join("\n");
   
         self!debug("perl6 code OK. code: $code") if $!debug-mode >= 2;
   
