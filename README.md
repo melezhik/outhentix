@@ -616,19 +616,26 @@ DSL code:
     # comment lines
     # and plain string check expressions:
 
-    generator: <<CODE    
-
-    my %d = { 
-      'foo' => 'foo value', 
-      'bar' => 'bar value' 
-    };
-
-    %d.keys:map  { 
-         "# $_", %d{$_}
-    }
+    use v6;
+    
+    use Outhentix::DSL;
+    
+    my $otx = Outhentix::DSL.new( text => q:to/HERE/, debug-mode => 0 );
+      foo value
+      bar value
+    HERE
+    
+    $otx.validate(q:to/CHECK/);
+    
+        generator: <<CODE
+        my %d = 'foo' => 'foo value', 'bar' => 'bar value';
+        %d.keys.flatmap: -> $k { ["#$k",  %d{$k}]    }
     
     CODE
-
+    CHECK
+    
+    say $otx.results;
+    
 
 Updated check list:
 
@@ -637,8 +644,13 @@ Updated check list:
     # bar
     bar value
 
+Output:
+
+    [{message => text match 'bar value ...', status => True, type => check-expression} {message => text match 'foo value ...', status => True, type => check-expression}]
 
 Generators could produce not only check expressions but code expressions and ... another generators.
+
+So ... use your imagination power! ...
 
 This is fictional example.
 
@@ -653,16 +665,14 @@ Input Text:
 DSL code:
 
     generator:  <<CODE
-    !perl5
+    !perl
 
     sub next_number {                       
         my $i = shift;                       
         $i++;                               
-        return [] if $i>=5;                 
-        [                                   
-            'regexp: ^'.('A' x $i).'$'      
-            "generator: next_number($i)"     
-        ]  
+        return if $i>=5;                 
+            print 'regexp: ^'.('A' x $i).'$',"\n";      
+            print "generator: next_number($i)","\n";     
     }
     CODE
 

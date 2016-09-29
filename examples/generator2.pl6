@@ -11,7 +11,7 @@ $otx.validate(q:to/CHECK/);
 
     generator: <<CODE
     my %d = 'foo' => 'foo value', 'bar' => 'bar value';
-    %d.keys.map({  my $k = $_; ["#$k",  %d{$k}]    })
+    %d.keys.flatmap: -> $k { ["#$k",  %d{$k}]    }
 
 CODE
 CHECK
@@ -19,7 +19,4 @@ CHECK
 say $otx.results;
 
 
-#my %d = 'foo' => 'foo value', 'bar' => 'bar value';
-# %d.keys.map:  { "# $_", %d{$_}  }
-#say %d.keys;
 
