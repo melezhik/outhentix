@@ -54,7 +54,6 @@ You define rules ( check expressions ) to describe expected content.
 
 You _extend_ a process of verification using regular programming languages - like Perl6, Perl5, Bash and Ruby, see examples below.
 
-
 ## DSL code
 
 A program code written on outhentix DSL language to verify text input.
@@ -143,7 +142,7 @@ input text to get verified
 
 Optional parameters are passed as hash:
 
-* check-max-len - truncate check expressions to a \`check-max-len' bytes when generating results
+* check-max-len - truncate check expressions to a `check-max-len` bytes when generating results
 
 This is useful when debugging long check expressions:
 
@@ -161,7 +160,7 @@ Output:
 
     [{message => text match '123456789 ...', status => True, type => check-expression}]
 
-Default value is \`40'.
+Default value is `40`.
 
 * debug-mode - enable debug mode
 
@@ -171,7 +170,7 @@ Default value is \`40'.
 
     * Increasing debug-mode value results in more low level information appeared.
 
-    * Default value is \`0' - means do not emit debug messages.
+    * Default value is `0` - means do not emit debug messages.
 
 ### validate
 
@@ -208,28 +207,28 @@ Client is a external program using DSL API. Existed outhentix clients:
 
 Outhentix DSL code comprises following entities:
 
-## Check expressions:
+* Comments
+
+* Blank lines
+
+* Check expressions:
 
     * plain     strings
     * regular   expressions
     * text      blocks
     * within    expressions
     * asserts   expressions
+    * validator expressions
     * range     expressions
 
-## Comments
 
-## Blank lines
+* Code expressions
 
-## Code expressions
-
-## Generator expressions
-
-## Validator expressions
+* Generator expressions
 
 # Check expressions
 
-Check expressions define patterns to match input text stream. 
+Check expressions define patterns to match against an input text stream. 
 
 Here is a simple example:
 
@@ -246,7 +245,7 @@ DSL code:
     regexp: \d\d\d\d-\d\d-\d\d
 
 
-Result:
+Result: verified
 
     +--------+------------------------------+
     | status | message                      |
@@ -264,7 +263,7 @@ There are two basic types of check expressions:
 
 # Plain text expressions 
 
-Plain text expressions define a lines to exists (included) at input text stream.
+Plain text expressions define a lines an input text to contain.
 
 DSL code:
         
@@ -273,10 +272,17 @@ DSL code:
 
 Input text:
 
-    I am ok , really
+    I am ok, really
     HELLO Outhentix !!!
 
 Result: verified
+
+    +--------+------------------------------+
+    | status | message                      |
+    +--------+------------------------------+
+    | OK     | matches "I am ok"            |
+    | OK     | matches HELLO Outhentix      |
+    +--------+------------------------------+
  
 Plain text expressions are case sensitive:
 
@@ -286,6 +292,11 @@ Input text:
  
 Result: not verified
 
+    +--------+------------------------------+
+    | status | message                      |
+    +--------+------------------------------+
+    | FAIL   | matches "I am OK"            |
+    +--------+------------------------------+
     
 # Regular expressions
 
@@ -312,11 +323,11 @@ Result - verified
  
 # One or many?
 
-* Parser does not care about _how many times_ a given check expression matches an input text.
+* Parser does not care about _how many times_ check expression matches an input text.
 
 * If at least _one line_ in a text matches the check expression - _this check_ is considered as successful.
 
-* If you use capturing regex expressions, parser  _accumulates_ all captured data to make it possible further proccessing.
+* If you use _capturing_ regex expressions, parser  _accumulates_ all captured data to make it possible further proccessing.
 
 Example:
 
@@ -342,7 +353,7 @@ Output:
 
     [["1", "one"], ["2", "two"], ["3", "three"]]
 
-See ["captures"](#captures) section for full explanation of a captures mechanism:
+See ["captures"](#captures) section for full explanation of a captures mechanism.
 
 # Comments, blank lines and text blocks
 
@@ -350,7 +361,7 @@ Comments and blank lines don't impact verification process but you may use them 
 
 # Comments
 
-Comment lines start with \`#' symbol, comments are ignored by parser.
+Comment lines start with `#` symbol, comments are ignored by parser.
 
 DSL code:
 
@@ -374,7 +385,7 @@ DSL code:
 
 But you **can't ignore** blank lines in a _text blocks_, [text blocks](#text-blocks) subsection for details.
 
-Use \`:blank_line' marker to match blank lines inside text blocks.
+Use `:blank_line` marker to match blank lines inside text blocks.
 
 DSL code:
 
@@ -429,14 +440,14 @@ Input text:
 
 Result - not verified
 
-\`begin:' \`end:' markers decorate text blocks content. 
+`begin:`, `end:` markers decorate text blocks content. 
 
 Markers should not be followed by any text at the same line.
 
 ## Don't forget to close the block ...
 
-Be aware if you leave "dangling" \`begin:' marker without closing \`end': somewhere else 
-parser will remain in a \`text block' mode till the end of the file, which is probably not you want:
+Be aware if you leave "dangling" `begin:` marker without closing `end:` somewhere else 
+parser will remain in a _text block_ mode till the end of the file, which is probably not you want:
 
 DSL code:
 
@@ -477,7 +488,7 @@ When use Perl expressions be aware of:
 
 * Follow [http://perldoc.perl.org/functions/eval.html](http://perldoc.perl.org/functions/eval.html) to know more about Perl eval function.
 
-One may use other languages in code expressions. Use should use \`here' document style ( see [multiline expressions](#Multiline expressions) section ) to insert your code and
+One may use other languages in code expressions. Use should use `here` document style ( see [multiline expressions](#Multiline expressions) section ) to insert your code and
 set shebang to define a language. Here are some examples:
 
 
@@ -526,7 +537,7 @@ into **stdout**. See examples below.
 
 * A new outhentix entries are passed back to parser and executed immediately.
 
-Generators expressions start with \`:generator' marker.
+Generators expressions start with `generator:` marker.
 
 Here is simple example.
 
@@ -655,7 +666,7 @@ WARNING!!! You should prefer asserts over validators. Validators feature will be
 
 Validator expressions are perl code expressions used for dynamic verification.
 
-Validator expressions start with \`validator:' marker.
+Validator expressions start with `validator:` marker.
 
 A Perl code inside validator block should _return_ array reference. 
 
@@ -684,10 +695,9 @@ DSL code:
     validator: [ int(rand(2)) > 1, 'I am lucky!'  ]
     
 
-Validators are often used with the [\`captures expressions'](#captures). This is another example.
+Validators are often used in conjunction with the [captures expressions](#captures). This is another example.
 
 Input text:
-
 
     # my family ages list
     alex    38
@@ -770,7 +780,7 @@ There are two ways to write multiline expressions:
 
 ### Back slash delimiters
 
-\`\' delimiters breaks a single line text on a multi lines.
+`\` delimiters breaks a single line text on a multi lines.
 
 Example:
 
@@ -967,7 +977,7 @@ Here more examples:
     # we only need a dates in 2000 year
     2000-
 
-Within expressions could be sequential, which effectively means using \`&&' logical operators for within expressions:
+Within expressions could be sequential, which effectively means using `&&` logical operators for within expressions:
 
 
     # try to find a date string in following format
@@ -1120,7 +1130,7 @@ Output:
 
 ## Restoring search context
         
-And finally to restore search context use \`reset\_context:' statement.
+And finally to restore search context use `reset\_context:` statement.
 
 Input text:
 
@@ -1353,9 +1363,9 @@ Output:
 
 # Examples
 
-Some code examples mostly mentioned at this documentation could be found at \`examples/' directory.
+Some code examples mostly mentioned at this documentation could be found at `examples/` directory.
 
-But examing unit tests code under `t/' could be also very useful.
+But examing unit tests code under `t/` could be also very useful.
 
 
 # Environment variables
