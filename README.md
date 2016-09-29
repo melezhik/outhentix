@@ -556,44 +556,41 @@ Generators expressions start with `generator:` marker.
 
 Here is simple example.
 
-DSL code:
+    use v6;
+    
+    use Outhentix::DSL;
+    
+    my $otx = Outhentix::DSL.new( text => 'HELLO', debug-mode => 0 );
+    
+    $otx.validate(q:to/CHECK/);
+      generator: [ 'H', 'E', 'L', 'O' ];
+    CHECK
+    
+    say $otx.results;
+    
+Output:
 
-    # original check list
 
+If you use not Perl6 langauge to generate expressions, you have to print entries into stdout instead of returning
+an array. Here are some generators examples for other languages:
+
+
+Original check expressions list:
+    
     Say
     HELLO
- 
-    # this generator creates 3 new check expressions:
+    
+This generator creates 3 new check expressions:
 
-    generator: <<CODE
-    [ 
-      'say', 
-      'hello', 
-      'again'
-    ]
-    CODE
-
-
-Updated check list:
-
-    Say
-    HELLO
-    say
-    hello
-    again
-
-
-
-If you use not Perl in generator expressions, you have to print entries into stdout instead of returning
-an array reference like in Perl. Here are some generators examples for other languages:
-
-
+    
     generator: <<CODE
     !bash
       echo say
       echo hello
       echo again
     CODE
+
+Or if you prefer Ruby:
 
     generator: <<CODE
     !ruby
@@ -602,16 +599,26 @@ an array reference like in Perl. Here are some generators examples for other lan
       puts 'again'
     CODE
 
-Here is more complicated example using Perl.
+Updated check list:
+
+    Say
+    HELLO
+    say
+    hello
+    again
+    
+
+Here is more complicated example using Perl5 language.
 
 DSL code:
-
 
     # this generator generates
     # comment lines
     # and plain string check expressions:
 
     generator: <<CODE    
+    !perl
+
     my %d = { 
       'foo' => 'foo value', 
       'bar' => 'bar value' 
@@ -647,6 +654,8 @@ Input Text:
 DSL code:
 
     generator:  <<CODE
+    !perl5
+
     sub next_number {                       
         my $i = shift;                       
         $i++;                               
@@ -666,12 +675,11 @@ Input:
 
 DSL code:
 
-
     number: (\d+)
 
     generator: <<CODE
     !ruby
-      puts "assert: #{capture()[0] == 10}, you've got 10!"  
+        puts "assert: #{capture()[0] == 10}, you've got 10!"  
     CODE
 
 
