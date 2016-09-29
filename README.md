@@ -621,10 +621,12 @@ DSL code:
     my %d = { 
       'foo' => 'foo value', 
       'bar' => 'bar value' 
-    }.keys:map  { 
+    };
+
+    %d.keys:map  { 
          "# $_", %d{$_}
-      } keys %d 
-    ]
+    }
+    
     CODE
 
 
