@@ -570,6 +570,7 @@ Here is simple example.
     
 Output:
 
+    [{message => text match 'H ...', status => True, type => check-expression} {message => text match 'E ...', status => True, type => check-expression} {message => text match 'L ...', status => True, type => check-expression} {message => text match 'O ...', status => True, type => check-expression}]
 
 If you use not Perl6 langauge to generate expressions, you have to print entries into stdout instead of returning
 an array. Here are some generators examples for other languages:
