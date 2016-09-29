@@ -396,8 +396,6 @@ class Outhentix::DSL {
 
         } elsif ($l ~~ m/^\s*end\:\s*$/) { # end of the text block
 
-            #self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
-
             $!block-mode = False;
 
             self!reset-context();
@@ -444,23 +442,25 @@ class Outhentix::DSL {
             $!context-modificator = Outhentix::DSL::Context::Range.new( bound-left => $a , bound-right => $b );
 
 
-        } elsif $l ~~ m/^\s*(code|generator|validator)\:\s*(.*)/  {
+        } elsif $l ~~ m/^\s* ( 'code' | 'generator'| 'validator' ) \: \s* (.*) /  {
+
+            my $my-block-type = $0;
 
             self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
-
-            $block-type = $0;
 
             my $code = $1;
 
             if $code ~~ s/.*\\\s*$// {
 
                  # this is multiline block, accumulate lines until meet '\' line
-
+                 $block-type = $my-block-type;
                  @multiline-block.push: $code;
 
                  self!debug("$block-type block start.") if $!debug-mode  >= 2;
 
-            } elsif $code ~~s/<<(\S+)// {
+            } elsif $code ~~ s/'<<' (\S+) // {
+
+                $block-type = $my-block-type;
 
                 $here-str-mode = True;
 
@@ -471,11 +471,11 @@ class Outhentix::DSL {
 
             } else {
 
+                self!debug("one-line $my-block-type found: $code") if $!debug-mode  >= 2;
+
                 self!flush-multiline-block( $block-type, @multiline-block) if $block-type;
 
-                $block-type = Nil;
-
-                self!"handle-$block-type"($code);
+                self!"handle-$my-block-type"($code.Str);
 
             }
 
